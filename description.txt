@@ -1,0 +1,18 @@
+Project: Battleship
+Description: We create two 10 by 10 grids for the 2 players. 
+In the initialization of the game both players can place their troops, namely:
+- 1 pcs 1x5 ship
+- 2 pcs 1x4 ship
+- 3 pcs 1x3 ship
+- 4 pcs 1x2 ship
+- 5 pcs 1x1 ship.
+
+After that, players take turns guessing in their opponent's field (e.g. A1) and shoot a torpedo.
+If their hint was correct, the ship (part) in that field will sink, if not, the torpedo will fall into the water.
+The player who sinks all of his opponent's ships wins.
+
+Specification:
+- osztály a hajóknak
+- server- client kapcsolat
+- robot elleni meccs
+- GUI
