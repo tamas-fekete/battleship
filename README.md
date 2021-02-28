@@ -52,7 +52,8 @@ The server will validate the guess and it’s going to calculate the new state a
 From the received new informations the player’s console or the GUI will refresh the game grid.
 
 ## Workflow
-We start to develop the local game (with the machine player) in a Text UI. When this passes the tests, we focus on the network game still with Text UI. In the last part of the project we create the GUI suitable for local and network game too.
+We start to develop the local game (with the machine player) in a Text UI. When this passes the tests, we focus on the network game still with Text UI. In the last part of the project we create the GUI suitable for local and network game too. 
+We are using microsoft teams to assign tasks and track their progress.
 
 ## Things we need to learn in order to be able to do this project
 - How do sockets work in python
