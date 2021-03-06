@@ -1,0 +1,87 @@
+Részletes játékmenet leírás:
+
+ember vs gép (konzol)
+
+
+1. Inicializálás: 
+
+	1.1 A hajók elhelyezése a táblára:
+		
+		8 darab hajót kell a játék kezdetekor elhelyeznie a játékosnak a táblán.
+		
+		A hajók elhelyezési sorrendje:	1-2. 1x1 hajó
+										3-4. 1x2 hajó
+										5-7. 1x3 hajó
+										8-9. 1x4 hajó
+										10.  1x5 hajó
+		
+		A hajók elhelyezési módja: Minden lépésben meg kell adni egy darab koordinátát, ezen a ponton fog kezdődni a hajó. 
+								   A hajó többi részét a játék automatikusan elhelyezi.
+								   Minden hajó elhelyezése után a játék "kirajzolja" a konzolra a 10x10 pályát és a hajókat, hogy a játékos
+								   lássa a szabad helyeket.
+	
+		A pálya inicializálása, akkor fejeződik be, ha az összes hajót elhelyezte a játékos.
+		
+		A háttérben az AI random lerakja a saját hajóit.
+		
+2.	A játék
+	
+	Miután a játékos elhelyezte a hajókat, megkezdődhet a tényleges játék.
+	
+	1. lépés:
+		
+		A játékos két 10x10-es táblát lát a konzolon:
+			
+		Az egyik 10x10-es táblán látja a saját hajóit. Egy másik 10x10-es táblán pedig látja, hogy melyik mezőre tippelt már, de 
+		nem volt találat, melyik mező az amire tippelt is és talált is és, hogy melyik mezőkre lehet még lőni.
+
+		Ahol a játékos a saját hajóit látja:		
+		
+			1 2 3 4 5 6 7 8 9 10
+		a	o o o o o o o o o X
+		b	o o o X o o X o o X
+		c	o o o o o o o o o X	
+		d	o o o o o o o o o X	
+		e	o X X X o o X X o o	
+		f	o o o o o o o o o X	
+		g	o o o o o o X X o X	
+		h	o o o o o o o o o X	
+		i   o X X X o X X X o X 
+		j 	o o o o o o o o o X 
+		
+		
+		Ahol a játékos látja a tippjeit, ez az első körben teljesen üres:		
+		
+			1 2 3 4 5 6 7 8 9 10
+		a	o o o o o o o o o o
+		b	o o o o o o o o o o
+		c	o o o o o o o o o o	
+		d	o o o o o o o o o o	
+		e	o o o o o o o o o o	
+		f	o o o o o o o o o o	
+		g	o o o o o o o o o o	
+		h	o o o o o o o o o o	
+		i   o o o o o o o o o o 
+		j 	o o o o o o o o o o
+	
+		Miután a táblákat kirajzolta a játék a konzolra, a játékosnak tippelnie kell. A játékos beír egy koordinátát és lenyomja az entert.
+		
+		Ezután az AI ellenőrzi, hogy eltalálta-e a játékos az AI egyik hajóját vagy sem. Az AI is megteszi a saját tippjét.
+		
+		Az enter lenyomása után a játékosnak a játék megint kirajzol két táblát. 
+		
+		Az első táblán látja a játékos a saját hajóit és azt is látja rajta, ha az AI tippje eltalálta-e valamelyiket.
+		A második táblán látni fogja a játékos, hogy az előző tippje eltalált-e valamit vagy sem.
+		
+		A játékosnak megint be kell írnia egy koordinátát és az egész folyamat kezdődik elölről.
+		
+		
+3. A játék vége:
+	
+		Ha az AI -nak vagy a játékosnak elsüllyedt az összes hajója a játék véget ér. Az nyer, akinek még maradt hajója.
+		
+		A játék ezután felajánlja, hogy kezdhet egy új játékot a játékos vagy kiléphet.
+		
+		
+		
+	

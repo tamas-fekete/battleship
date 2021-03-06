@@ -1,0 +1,122 @@
+~$ 	**********	Welcome to BATTLESHIP! ************
+~$ Place a 1x1 ship: A1
+
+			1 2 3 4 5 6 7 8 9 10
+		a	X o o o o o o o o o
+		b	o o o o o o o o o o
+		c	o o o o o o o o o o	
+		d	o o o o o o o o o o	
+		e	o o o o o o o o o o	
+		f	o o o o o o o o o o	
+		g	o o o o o o o o o o	
+		h	o o o o o o o o o o	
+		i   o o o o o o o o o o 
+		j 	o o o o o o o o o o
+	
+~$ Place a 1x1 ship: A1
+~$ Theres already a ship on that coordinate
+~$ Place a 1x1 ship: A2
+~$ You can't place ships next to each other!
+~$ Place a 1x1 ship: A5
+~$ 
+
+			1 2 3 4 5 6 7 8 9 10
+		a	X o o o X o o o o o
+		b	o o o o o o o o o o
+		c	o o o o o o o o o o	
+		d	o o o o o o o o o o	
+		e	o o o o o o o o o o	
+		f	o o o o o o o o o o	
+		g	o o o o o o o o o o	
+		h	o o o o o o o o o o	
+		i   o o o o o o o o o o 
+		j 	o o o o o o o o o o
+
+~$ Place a 1x2 ship: D3
+~$ 
+
+			1 2 3 4 5 6 7 8 9 10
+		a	X o o o X o o o o o
+		b	o o o o o o o o o o
+		c	o o o o o o o o o o	
+		d	o o X X o o o o o o	
+		e	o o o o o o o o o o	
+		f	o o o o o o o o o o	
+		g	o o o o o o o o o o	
+		h	o o o o o o o o o o	
+		i   o o o o o o o o o o 
+		j 	o o o o o o o o o o
+		
+		
+"Tehát itt most végigkérdezi az összes hajót, jelez ha valami ütközés van stb, az utolsó hajó lerakása utána ezt látná a játékos:"
+
+
+~$
+
+			YOUR BOARD:			
+			1 2 3 4 5 6 7 8 9 10
+		a	o o o o o o o o o X
+		b	o o o X o o X o o X
+		c	o o o o o o o o o X	
+		d	o o o o o o o o o X	
+		e	o X X X o o X X o o	
+		f	o o o o o o o o o X	
+		g	o o o o o o X X o X	
+		h	o o o o o o o o o X	
+		i   o X X X o X X X o X 
+		j 	o o o o o o o o o X 
+
+
+			OPPONENT'S BOARD:
+			1 2 3 4 5 6 7 8 9 10
+		a	o o o o o o o o o o
+		b	o o o o o o o o o o
+		c	o o o o o o o o o o	
+		d	o o o o o o o o o o	
+		e	o o o o o o o o o o	
+		f	o o o o o o o o o o	
+		g	o o o o o o o o o o	
+		h	o o o o o o o o o o	
+		i   o o o o o o o o o o 
+		j 	o o o o o o o o o o
+
+~$ Your next guess: A4
+~$ Your torpedo missed. The AI guessed E3, one of your ships got hit.
+
+			YOUR BOARD:			
+			1 2 3 4 5 6 7 8 9 10
+		a	o o o o o o o o o X
+		b	o o o X o o X o o X
+		c	o o o o o o o o o X	
+		d	o o o o o o o o o X	
+		e	o H X X o o X X o o	
+		f	o o o o o o o o o X	
+		g	o o o o o o X X o X	
+		h	o o o o o o o o o X	
+		i   o X X X o X X X o X 
+		j 	o o o o o o o o o X 
+
+
+			OPPONENT'S BOARD:
+			1 2 3 4 5 6 7 8 9 10
+		a	o o o M o o o o o o
+		b	o o o o o o o o o o
+		c	o o o o o o o o o o	
+		d	o o o o o o o o o o	
+		e	o o o o o o o o o o	
+		f	o o o o o o o o o o	
+		g	o o o o o o o o o o	
+		h	o o o o o o o o o o	
+		i   o o o o o o o o o o 
+		j 	o o o o o o o o o o
+~$ Your next guess:
+
+"Itt H betűvel jelzi, hogy az AI eltalálta (HIT) az egyik hajót. Az OPPONENT'S BOARD-on pedig M betűvel (MISSED) jelzi, hogy 
+nem talált el semmit a játékos. A játékos megteheti a következő tippjét.
+Amennyiben az egyik hajó összes koordinátáját kilőtték akkor a hajó elsüllyedt, ezt a táblán S (SINK) betűvel lehetne jelezni."
+
+
+
+
+
+
