@@ -5,7 +5,7 @@ class GameLogic():
         self.state = [0]*100
         # [number, size]
         self.ships = [[2, 1], [2,2], [3,3], [2,4], [1,5]]
-        # minden hajó egy list ebben a list-ben, a hajo altal felvett koordinatakat tartalmazza
+        # minden hajo egy list ebben a list-ben, a hajo altal felvett koordinatakat tartalmazza
         self.playerOneShips = []
         self.playerTwoShips = []
 
@@ -54,4 +54,4 @@ gl = GameLogic()
 readIn(gl)
 print(gl.playerOneShips)
 #gl.printState()
-# TODO hajokat ne lehessen egymás melle helyezni
+# TODO hajokat ne lehessen egymas melle helyezni
