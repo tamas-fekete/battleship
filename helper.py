@@ -12,9 +12,8 @@ def stringToCoordinate(strCoord):
     
     y = ord(strCoord[0]) - ord('a')
     x = int(strCoord[1:])-1
-    
-    coordinates.extend([x,y])
-    return coordinates
+
+    return y*10+x
  
  
 
@@ -27,5 +26,3 @@ def validateStringCoordinate(strCoord):
         return False
     else:
         return True
-        
-    
