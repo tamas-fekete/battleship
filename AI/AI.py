@@ -10,4 +10,5 @@ class AIClass:
         self.playerOneShips = []
         self.playerTwoShips = []
 
+
 print("Ez a merge próba")
