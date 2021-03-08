@@ -1,5 +1,4 @@
-
-from battleship.helper import helper as hl
+from helper import helper as hl
 
 # GameLogic osztaly: sorfolytonos repr. allapot, jatekosok hajoinak tarolasa, szukseges hajok
 class GameLogic():
