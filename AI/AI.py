@@ -9,3 +9,5 @@ class AIClass:
         # minden hajó egy list ebben a list-ben, a hajo altal felvett koordinatakat tartalmazza
         self.playerOneShips = []
         self.playerTwoShips = []
+
+print("Ez a merge próba")
