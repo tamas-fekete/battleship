@@ -1,5 +1,5 @@
 import re
-
+from enum import Enum
 # helper functions
 
 
@@ -14,8 +14,14 @@ def stringToCoordinate(strCoord):
     x = int(strCoord[1:])-1
 
     return y*10+x
- 
- 
+def coordinateToString(coordinate):
+    result=str(coordinate)
+
+class States(Enum):
+    WATER = 0
+    SHIP = 1
+    MISSED = 2
+    HIT = 3
 
 # this function will check if the string is a valid coordinate
 # input: string
