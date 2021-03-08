@@ -42,6 +42,20 @@ def coordinateToString(coordinate):
         elif result[0]=="9":
             return "J"+str(int(result[1])+1)
 
+def getNeighbours(coordinate):
+    lis=[]
+    x= coordinate%10
+    y= int(coordinate/10)
+    print(x,y)
+    for i in range(max(0,x-1),min(9,x+1)+1):
+        for j in range(max(0,y-1),min(9,y+1)+1):
+            lis.append(j*10+i)
+
+    print(range(max(0,x-1),min(9,x+1)+1))
+    print(range(max(0,y-1),min(9,y+1)+1))
+    return lis
+
+
 
 class States(Enum):
     WATER = 0
