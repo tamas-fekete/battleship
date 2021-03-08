@@ -41,13 +41,6 @@ def coordinateToString(coordinate):
             return "I"+str(int(result[1])+1)
         elif result[0]=="9":
             return "J"+str(int(result[1])+1)
-print(coordinateToString(72))
-print(coordinateToString(0))
-print(coordinateToString(65))
-print(coordinateToString(100))
-print(coordinateToString(99))
-
-
 
 
 class States(Enum):
