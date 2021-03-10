@@ -46,15 +46,26 @@ def getNeighbours(coordinate):
     lis=[]
     x= coordinate%10
     y= int(coordinate/10)
-    print(x,y)
     for i in range(max(0,x-1),min(9,x+1)+1):
         for j in range(max(0,y-1),min(9,y+1)+1):
             lis.append(j*10+i)
 
-    print(range(max(0,x-1),min(9,x+1)+1))
-    print(range(max(0,y-1),min(9,y+1)+1))
     return lis
 
+def getPossibleShipPositions(coordinate):
+    lis=[]
+    x= coordinate%10
+    y= int(coordinate/10)
+    if y!=0:
+        lis.append(coordinate-10)
+    if x!=0:
+        lis.append(coordinate-1)
+    if x!=9:
+        lis.append(coordinate+1)
+    if y!=9:
+        lis.append(coordinate+10)
+    return lis
+print(getPossibleShipPositions(23))
 
 
 class States(Enum):
@@ -62,6 +73,9 @@ class States(Enum):
     SHIP = 1
     MISSED = 2
     HIT = 3
+    SINK = 4
+
+
 
 # this function will check if the string is a valid coordinate
 # input: string
