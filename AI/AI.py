@@ -17,6 +17,8 @@ class AIClass:
         self.myShotsReplies=[];
         self.possibleDeleteindicesHorizontal=[]
         self.possibleDeleteindicesVertical=[]
+        self.sinkremove=[]
+        self.memo=None
 
     def nextStep(self,replyfromserver=hl.States.MISSED):
         self.replyFromServer=replyfromserver
@@ -40,15 +42,27 @@ class AIClass:
 
             self.myShotsReplies.append(self.replyFromServer)
             if self.replyFromServer==hl.States.MISSED:
-                nextstep=self.possibleShots[0]
-                self.possibleShots.remove(self.possibleShots[0])
+                print(self.myShots[-1], "NEM TALÁLT")
+                nextstep= None
+                if self.memo is None:
+                    nextstep=self.possibleShots[0]
+                    self.possibleShots.remove(self.possibleShots[0])
+                else:
+                    nextstep=self.memo
+                    self.possibleShots.remove(self.memo)
+                    self.memo=None
+
                 print("LOVES",nextstep)
                 print(self.possibleShots)
                 self.myShots.append(nextstep)
                 yield nextstep
             elif self.replyFromServer==hl.States.HIT:
+                print(self.myShots[-1], "TALÁLT")
              #   print(len(self.myShots))
                 if len(self.myShotsReplies)>=2 and self.myShotsReplies[-2]==hl.States.HIT:
+                    if self.myShotsReplies[-2]!=hl.States.HIT:
+                        self.memo=self.possibleShots[0]
+
                     print("EDDIGI LOVESEK",self.myShots[-1], self.myShots[-2])
                     print(len(self.myShotsReplies), self.myShotsReplies[-2])
                     if self.myShots[-1] in self.possibleDeleteindicesVertical:
@@ -61,6 +75,8 @@ class AIClass:
                             self.possibleShots.remove(i)
 
                 preferred_indeces= hl.getPossibleShipPositions(self.myShots[-1])
+                for i in preferred_indeces:
+                    self.sinkremove.append(i)
                 random.shuffle(preferred_indeces)
 
 
@@ -90,20 +106,34 @@ class AIClass:
 
 
 
-                        tmpind=self.possibleShots.index(preferred_indeces[i])
-                        tmp=self.possibleShots[i]
-                        self.possibleShots[i]=preferred_indeces[i]
-                        self.possibleShots[tmpind]=tmp
 
 
 
-                print(self.possibleShots)
+
+
                 for i in need_to_be_deleted:
                     preferred_indeces.remove(i)
+                    print("remove",i)
                     self.possibleShots.remove(i)
+                #ha lenne emlékben valami fontos:
+               # mem = self.possibleShots[0]
+                #self.possibleShots[0] = self.possibleShots[1]
+                #self.possibleShots[1] = mem
+
+                for i in range(len(preferred_indeces)):
+                    if preferred_indeces[i] in self.possibleShots:
+                        #tmpind = self.possibleShots.index(preferred_indeces[i])
+                        tmp = self.possibleShots[i]
+                        self.possibleShots.remove(preferred_indeces[i])
+
+
+                        self.possibleShots[i] = preferred_indeces[i]
+                        self.possibleShots.append(tmp)
 
                 nextstep = self.possibleShots[0]
-                self.possibleShots.remove(self.possibleShots[0])
+                print(self.possibleShots)
+                self.possibleShots.remove(self.possibleShots[0])#amit lövök azt kiveszem
+
                 print("LOVES",nextstep)
                 print(self.possibleShots)
                 print(self.myShots[-1],nextstep)
@@ -124,7 +154,24 @@ class AIClass:
 
 
             elif self.replyFromServer==hl.States.SINK:
-                pass
+                print(self.myShots[-1], "SINK")
+                preferred_indeces = hl.getPossibleShipPositions(self.myShots[-1])
+                for i in preferred_indeces:
+                    if i in self.possibleShots:
+                        print("torlom",i)
+                        self.possibleShots.remove(i)
+                for i in self.sinkremove:
+                    if i in self.possibleShots:
+                        print("torlom",i)
+                        self.possibleShots.remove(i)
+                nextstep = self.possibleShots[0]
+                print(self.possibleShots)
+                self.possibleShots.remove(self.possibleShots[0])  # amit lövök azt kiveszem
+                print("LOVES", nextstep)
+                yield nextstep
+
+
+
 
 
 
@@ -141,7 +188,12 @@ print("negyedik")
 a.nextStep(hl.States.MISSED)
 print("otodik")
 a.nextStep(hl.States.HIT)
-
+print("hatodik")
+a.nextStep(hl.States.SINK)
+print("hetedik")
+a.nextStep(hl.States.MISSED)
+print("nyolcadik")
+a.nextStep(hl.States.MISSED)
 
 
 
