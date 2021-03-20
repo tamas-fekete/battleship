@@ -1,0 +1,17 @@
+# .coveragerc to control coverage.py
+[run]
+source =
+		helper
+		AI
+		gameLogic
+omit =
+        *Test*
+        */usr/local/lib*
+        */__init__.py
+
+
+[report]
+omit =
+        *Test*
+        */usr/local/lib*
+        */__init__.py
