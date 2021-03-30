@@ -55,6 +55,20 @@ def getNeighbours(coordinate):
     #print(range(max(0,y-1),min(9,y+1)+1))
     return set(lis)
 
+def getPossibleShipPositions(coordinate):
+    lis=[]
+    x= coordinate%10
+    y= int(coordinate/10)
+    if y!=0:
+        lis.append(coordinate-10)
+    if x!=0:
+        lis.append(coordinate-1)
+    if x!=9:
+        lis.append(coordinate+1)
+    if y!=9:
+        lis.append(coordinate+10)
+    return lis
+print(getPossibleShipPositions(23))
 
 
 class States(Enum):
