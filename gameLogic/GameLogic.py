@@ -70,8 +70,9 @@ def readIn(gl):
             neighbours = set([])
             for coord in coordinates:
                 neighbours.update(hl.getNeighbours(coord))
+            print(forbiddenSpaces)
             #[neighbours.remove(coord) for coord in coordinates]
-            if len(forbiddenSpaces.intersection(neighbours)) == 0:
+            if len(forbiddenSpaces.intersection(set(coordinates))) == 0:
                 for k in coordinates:
                     gl.state[k] = hl.States.SHIP
                 forbiddenSpaces.update(neighbours)
@@ -88,16 +89,16 @@ def readIn(gl):
 gl = GameLogic()
 readIn(gl)
 print(gl.playerOneShips)
-# gl.printState()
-# print("Lojj kettot\n")
-# gl.step(0)
-# gl.printState()
-# print(gl.playerOneShips)
-# print("\n")
-# gl.step(15)
-# gl.printState()
-# print("\n")
-# gl.step(14)
-# gl.printState()
+gl.printState()
+print("Lojj kettot\n")
+gl.step(0)
+gl.printState()
+print(gl.playerOneShips)
+print("\n")
+gl.step(15)
+gl.printState()
+print("\n")
+gl.step(14)
+gl.printState()
 
 
