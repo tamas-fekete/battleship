@@ -59,40 +59,28 @@ def readIn(gl):
             else: break
 
             tempShips = []
-            # a hajo oszlopban van, meret megfelelo
-            # TODO eloszor gyujtsuk ki az osszes koordinatat (betenni kivant hajoet), majd aztan vessuk ossze a tilos helyekkel
-            # TODO ez eleg fontos :D
             if(coordOne%10 == coordTwo%10) and (int(abs(coordTwo - coordOne) / 10 + 1) == size):
-                for i in range(min(coordOne, coordTwo), max(coordOne, coordTwo)+10, 10):
-                    if len(forbiddenSpaces.intersection({i})) == 0:
-                    #    for elem in hl.getNeighbours(i):
-                    #        forbiddenSpaces.add(elem)
-                        gl.state[i] = hl.States.SHIP
-                        tempShips.append(i)
-                    else:
-                        # TODO vissza kell leptetni a for ciklust (iterator) belso for ciklusnal
-                        print("Nem lehet ide helyezni hajot.")
-                        break
-                for i in range(min(coordOne, coordTwo), max(coordOne, coordTwo)+10, 10):
-                    for elem in hl.getNeighbours(i):
-                        forbiddenSpaces.add(elem)
-            # a hajo sorban van, meret megfelelo
-            elif(abs(coordTwo - coordOne)+1 == size):
-                for i in range(min(coordOne, coordTwo), max(coordOne, coordTwo)+1):
-                    if len(forbiddenSpaces.intersection({i})) == 0:
-                        #for elem in hl.getNeighbours(i):
-                        #    forbiddenSpaces.add(elem)
-                        gl.state[i] = hl.States.SHIP
-                        tempShips.append(i)
-                    else:
-                        print("Nem lehet ide helyezni hajot.")
-                        break
-                for i in range(min(coordOne, coordTwo), max(coordOne, coordTwo)+1):
-                    for elem in hl.getNeighbours(i):
-                        forbiddenSpaces.add(elem)
+                coordinates = [k for k in range(min(coordOne, coordTwo), max(coordOne, coordTwo)+10, 10)]
+            elif (abs(coordTwo - coordOne) + 1 == size):
+                coordinates = [k for k in range(min(coordOne, coordTwo), max(coordOne, coordTwo)+1)]
             else:
-                print("Rossz koordinatak!")
+                print("Rossz koordinatak, vagy nem sorban/oszlopban van a hajo, vagy nem jo meretu!")
                 break
+
+            neighbours = set([])
+            for coord in coordinates:
+                neighbours.update(hl.getNeighbours(coord))
+            #[neighbours.remove(coord) for coord in coordinates]
+            if len(forbiddenSpaces.intersection(neighbours)) == 0:
+                for k in coordinates:
+                    gl.state[k] = hl.States.SHIP
+                forbiddenSpaces.update(neighbours)
+                forbiddenSpaces.update(coordinates)
+                gl.playerOneShips.append(coordinates)
+            else:
+                print("Rossz koordinatak, nem lehet ilyen kozel helyezni hajot egy masikhoz!")
+                break
+
             print(forbiddenSpaces)
             gl.playerOneShips.append(tempShips)
             gl.printState()
@@ -100,15 +88,16 @@ def readIn(gl):
 gl = GameLogic()
 readIn(gl)
 print(gl.playerOneShips)
-print("Lojj kettot\n")
-gl.step(0)
-gl.printState()
-print(gl.playerOneShips)
-print("\n")
-gl.step(15)
-gl.printState()
-print("\n")
-gl.step(14)
-gl.printState()
+# gl.printState()
+# print("Lojj kettot\n")
+# gl.step(0)
+# gl.printState()
+# print(gl.playerOneShips)
+# print("\n")
+# gl.step(15)
+# gl.printState()
+# print("\n")
+# gl.step(14)
+# gl.printState()
 
 

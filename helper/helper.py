@@ -68,7 +68,6 @@ def getPossibleShipPositions(coordinate):
     if y!=9:
         lis.append(coordinate+10)
     return lis
-print(getPossibleShipPositions(23))
 
 
 class States(Enum):
