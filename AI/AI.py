@@ -20,10 +20,76 @@ class AIClass:
         self.sinkremove=[]
         self.memo=None
         self.myShips = [[0], [15], [26, 27], [45, 55]]
+        self.initShips()
 
     def nextStep(self,replyfromserver=hl.States.MISSED):
         self.replyFromServer=replyfromserver
         return next(self.nextSetepGenerator)
+    def initShips(self):
+        self.myShips=[]
+        possiblePositions= [i for i in range(100)]
+        sizes=[5,4,4,3,3,3,2,2,1,1]
+        for i in range(10):
+            pos_good=False
+            pos=None
+            good_dirs=[]
+            while not pos_good:
+                pos = random.randint(0, 99)
+                print(pos)
+                for size in range(sizes[i]):
+                    if pos+size not in possiblePositions :
+                        break
+                    else:
+                        if size==sizes[i]-1:
+                            good_dirs.append(1)
+                            pos_good=True
+                for size in range(sizes[i]):
+                    if pos-size not in possiblePositions :
+                        break
+                    else:
+                        if size==sizes[i]-1:
+                            good_dirs.append(-1)
+                            pos_good=True
+                for size in range(sizes[i]):
+                    if pos+(size*10) not in possiblePositions :
+                        break
+                    else:
+                        if size==sizes[i]-1:
+                            good_dirs.append(10)
+                            pos_good=True
+                for size in range(sizes[i]):
+                    if pos-(size*10) not in possiblePositions :
+                        break
+                    else:
+                        if size==sizes[i]-1:
+                            good_dirs.append(-10)
+                            pos_good=True
+
+            if sizes[i]==111:
+                need_to_be_deleted= hl.getNeighbours(pos)
+                print(need_to_be_deleted,pos)
+                for j in need_to_be_deleted:
+                    if j in possiblePositions:
+                        possiblePositions.remove(j)
+                print(possiblePositions)
+                nextship=[pos]
+                self.myShips.append(nextship)
+            else:
+                nextship=[pos]
+                random.shuffle(good_dirs)
+                for h in range(1,sizes[i]):
+                    nextship.append(pos+good_dirs[0]*h)
+                for coord in nextship:
+                    need_to_be_deleted=hl.getNeighbours(coord)
+                    for d in need_to_be_deleted:
+                        if d in possiblePositions:
+                            possiblePositions.remove(d)
+                self.myShips.append(nextship)
+
+        print(self.myShips)
+
+
+
 
 
 
@@ -177,7 +243,8 @@ class AIClass:
 
 
 
-
+ai =AIClass()
+ai.initShips()
 
 # a = AIClass()
 # print("nulladik")
