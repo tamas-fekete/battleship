@@ -3,7 +3,9 @@ from helper import helper as hl
 # GameLogic osztaly: sorfolytonos repr. allapot, jatekosok hajoinak tarolasa, szukseges hajok
 class GameLogic():
     def __init__(self):
+        self.previousShot = None
         self.state = [hl.States.WATER]*100
+        self.opponentState = [hl.States.WATER] * 100
         # [number, size]
         # minden hajó egy list ebben a list-ben, a hajo altal felvett koordinatakat tartalmazza
         self.ships = [[2, 1], [2,2]] #, [3,3], [2,4], [1,5]]
@@ -14,10 +16,19 @@ class GameLogic():
     def printState(self):
         letters = ['B', 'C', 'D', 'E', 'F', 'G', 'H', 'I', 'J']
         counter = 0
-        stateStr = "  1 2 3 4 5 6 7 8 9 10\nA "
-        for i in range(0,len(self.state)):
-            stateStr += str(self.state[i].value) + " "
+        stateStr = "Opponent board\n"
+        stateStr += "  1 2 3 4 5 6 7 8 9 10\nA "
+        for i in range(0,len(self.opponentState)):
+            stateStr += str(self.opponentState[i].value) + " "
             if ((i+1)%10 == 0) and (i != 99):
+                stateStr += "\n" + letters[counter] + " "
+                counter += 1
+        stateStr += "\nMy board\n"
+        counter = 0
+        stateStr += "  1 2 3 4 5 6 7 8 9 10\nA "
+        for i in range(0, len(self.state)):
+            stateStr += str(self.state[i].value) + " "
+            if ((i + 1) % 10 == 0) and (i != 99):
                 stateStr += "\n" + letters[counter] + " "
                 counter += 1
         print(stateStr)
@@ -35,7 +46,6 @@ class GameLogic():
                 stateStr += "\n" + letters[counter] + " "
                 counter += 1
         print(stateStr)
-
 
     def responseOfMissile(self, coord):
         if self.state[coord] == hl.States.SHIP:
@@ -58,13 +68,24 @@ class GameLogic():
             self.state[coord] = hl.States.MISSED
             return hl.States.MISSED
 
-
     def shoot(self):
         coordinate = input().lower()
         if hl.validateStringCoordinate(coordinate):
+            self.previousShot = hl.stringToCoordinate(coordinate)
             return hl.stringToCoordinate(coordinate)
         else:
             print("Rossz helyre lonel.")
+
+    def updateOpponentState(self, response):
+        self.opponentState[self.previousShot] = response
+        if response == hl.States.SINK:
+            for i in range(0, 100):
+                # TODO ez lehet, hogy nem kosher igy
+                if self.opponentState[i] == hl.States.HIT and [elem != hl.States.SHIP for elem in hl.getNeighbours(i)]:
+                    self.opponentState[i] = hl.States.SINK
+
+    def setPreviousShot(self, prev):
+        self.previousShot = prev
 
     def readInAIShips(self, AIships):
         self.playerOneShips = AIships
@@ -72,9 +93,6 @@ class GameLogic():
         for k in ships:
             self.state[k] = hl.States.SHIP
 
-
-
-#beolvasas, hajok elhelyezese
     def readIn(self):
         forbiddenSpaces = set([])
         for i in self.ships:

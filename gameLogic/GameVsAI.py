@@ -12,36 +12,35 @@ class GameVsAI:
 
     def initialization(self):
         self.glAI.readInAIShips(self.AI.placeShips())
-        print("AI has placed its ships.\n")
+        print("AI has placed its ships.")
         self.gl1.readIn()
 
     def game(self):
         print("Player shoot: ")
-        self.glAI.responseOfMissile(self.gl1.shoot())
-        print("Table of AI")
-        self.glAI.printStateForOpponent()
-        print("\n")
+        response = self.glAI.responseOfMissile(self.gl1.shoot())
+        self.gl1.updateOpponentState(response)
         print("AI shoot: ")
-        # AI lo
-        response = self.gl1.responseOfMissile(self.AI.nextStep())
-        print("Table of Player")
+        responseAI = self.gl1.responseOfMissile(self.AI.nextStep())
+        self.glAI.setPreviousShot(self.AI.nextStep())
+        self.glAI.updateOpponentState(responseAI)
+
         self.gl1.printState()
 
-        print("\n")
         while(not self.isEnd):
-            # jatekos lo
             print("Player shoot: ")
-            self.glAI.responseOfMissile(self.gl1.shoot())
-            self.glAI.printStateForOpponent()
+            response = self.glAI.responseOfMissile(self.gl1.shoot())
+            self.gl1.updateOpponentState(response)
             if(len(self.glAI.playerOneShips) == 0): self.isEnd = True
-            print("\n")
+
+
             print("AI shoot: ")
             # AI lo
-            response = self.gl1.responseOfMissile(self.AI.nextStep(response))
-            self.gl1.printState()
+            responseAI = self.gl1.responseOfMissile(self.AI.nextStep(responseAI))
+            self.glAI.updateOpponentState(responseAI)
             if (len(self.gl1.playerOneShips) == 0): self.isEnd = True
 
-            print("\n")
+
+            self.gl1.printState()
 
 
 
