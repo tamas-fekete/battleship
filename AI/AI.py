@@ -11,14 +11,15 @@ class AIClass:
         self.myShots=[]
         self.possibleShots=list(range(0,100))
         random.shuffle(self.possibleShots)
-        print(self.possibleShots)
+        #print(self.possibleShots)
         self.nextSetepGenerator=self.calculateNextStep()
         self.replyFromServer=hl.States.MISSED
-        self.myShotsReplies=[];
+        self.myShotsReplies=[]
         self.possibleDeleteindicesHorizontal=[]
         self.possibleDeleteindicesVertical=[]
         self.sinkremove=[]
         self.memo=None
+        self.myShips = [[0], [15], [26, 27], [45, 55]]
 
     def nextStep(self,replyfromserver=hl.States.MISSED):
         self.replyFromServer=replyfromserver
@@ -36,7 +37,7 @@ class AIClass:
       #  print(self.possibleShots)
         self.myShots.append(nextstep)
         print("LOVES",nextstep)
-        print(self.possibleShots)
+        #print(self.possibleShots)
         yield nextstep
         while True:
 
@@ -170,30 +171,33 @@ class AIClass:
                 print("LOVES", nextstep)
                 yield nextstep
 
+    def placeShips(self):
+        return self.myShips
 
 
 
 
 
-a = AIClass()
-print("nulladik")
-a.nextStep()
-print("ELSő")
-a.nextStep(hl.States.MISSED)
-print("masodik")
-a.nextStep(hl.States.HIT)
-print("harmadik")
-a.nextStep(hl.States.HIT)
-print("negyedik")
-a.nextStep(hl.States.MISSED)
-print("otodik")
-a.nextStep(hl.States.HIT)
-print("hatodik")
-a.nextStep(hl.States.SINK)
-print("hetedik")
-a.nextStep(hl.States.MISSED)
-print("nyolcadik")
-a.nextStep(hl.States.MISSED)
+
+# a = AIClass()
+# print("nulladik")
+# a.nextStep()
+# print("ELSő")
+# a.nextStep(hl.States.MISSED)
+# print("masodik")
+# a.nextStep(hl.States.HIT)
+# print("harmadik")
+# a.nextStep(hl.States.HIT)
+# print("negyedik")
+# a.nextStep(hl.States.MISSED)
+# print("otodik")
+# a.nextStep(hl.States.HIT)
+# print("hatodik")
+# a.nextStep(hl.States.SINK)
+# print("hetedik")
+# a.nextStep(hl.States.MISSED)
+# print("nyolcadik")
+# a.nextStep(hl.States.MISSED)
 
 
 
