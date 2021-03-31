@@ -27,8 +27,8 @@ class GameLogic():
         counter = 0
         stateStr = "  1 2 3 4 5 6 7 8 9 10\nA "
         for i in range(0,len(self.state)):
-            if self.state[i].value == hl.States.SHIP:
-                stateStr += str(hl.States.WATER) + " "
+            if self.state[i] == hl.States.SHIP:
+                stateStr += str(hl.States.WATER.value) + " "
             else:
                 stateStr += str(self.state[i].value) + " "
             if ((i+1)%10 == 0) and (i != 99):
@@ -112,7 +112,7 @@ class GameLogic():
 
                 #print(forbiddenSpaces)
                 self.printState()
-                print(self.playerOneShips)
+                #print(self.playerOneShips)
 
 # gl = GameLogic()
 # readIn(gl)

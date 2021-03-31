@@ -6,7 +6,7 @@ import random
 class AIClass:
     def __init__(self):
         self.state = [hl.States.WATER] * 100
-        self.ships = [[2, 1]]  # , [2,2], [3,3], [2,4], [1,5]]
+        self.ships = [[2, 1], [2,2]] #, [3,3], [2,4], [1,5]]
         self.lastShot=None
         self.myShots=[]
         self.possibleShots=list(range(0,100))
@@ -23,7 +23,7 @@ class AIClass:
 
     def nextStep(self,replyfromserver=hl.States.MISSED):
         self.replyFromServer=replyfromserver
-        next(self.nextSetepGenerator)
+        return next(self.nextSetepGenerator)
 
 
 
@@ -54,7 +54,7 @@ class AIClass:
                     self.memo=None
 
                 print("LOVES",nextstep)
-                print(self.possibleShots)
+                #print(self.possibleShots)
                 self.myShots.append(nextstep)
                 yield nextstep
             elif self.replyFromServer==hl.States.HIT:
@@ -65,7 +65,7 @@ class AIClass:
                         self.memo=self.possibleShots[0]
 
                     print("EDDIGI LOVESEK",self.myShots[-1], self.myShots[-2])
-                    print(len(self.myShotsReplies), self.myShotsReplies[-2])
+                    #print(len(self.myShotsReplies), self.myShotsReplies[-2])
                     if self.myShots[-1] in self.possibleDeleteindicesVertical:
                         for i in self.possibleDeleteindicesHorizontal:
                             print("remove",i)
@@ -83,24 +83,24 @@ class AIClass:
 
 
                 print(preferred_indeces)
-                print(self.possibleShots)
+                #print(self.possibleShots)
                 need_to_be_deleted=[]
                 for i in range (len(preferred_indeces)):#change positions
                     Need= True
                     if preferred_indeces[i] in self.possibleShots:
                         if len(self.myShotsReplies) >= 2 and self.myShotsReplies[-2] == hl.States.HIT:
-                            print(self.myShots[-1],self.myShots[-2])
+                            #print(self.myShots[-1],self.myShots[-2])
                             print(
-                                "elizo loves " + str(self.myShots[-1]) + " vizsgalt elem " + str(preferred_indeces[i]))
+                                "elozo loves " + str(self.myShots[-1]) + " vizsgalt elem " + str(preferred_indeces[i]))
                             if abs(self.myShots[-1]-self.myShots[-2])>=10:
                                 if abs(preferred_indeces[i] - self.myShots[-1]) < 10:
-                                    print("ez most horizontális szomszéd ezért tölrom.", preferred_indeces[i])
+                                    print("ez most horizontalis szomszéd ezért torlom.", preferred_indeces[i])
                                     need_to_be_deleted.append(preferred_indeces[i])
                                  #   preferred_indeces.remove(preferred_indeces[i])
                                     continue
                             else:
                                 if abs(preferred_indeces[i] - self.myShots[-1]) >= 10:
-                                    print("ez most vertikalis szomszéd ezért tölrom.", preferred_indeces[i])
+                                    print("ez most vertikalis szomszéd ezért torlom.", preferred_indeces[i])
                                     need_to_be_deleted.append(preferred_indeces[i])
                                   #  preferred_indeces.remove(preferred_indeces[i])
                                     continue
@@ -132,11 +132,11 @@ class AIClass:
                         self.possibleShots.append(tmp)
 
                 nextstep = self.possibleShots[0]
-                print(self.possibleShots)
+                #print(self.possibleShots)
                 self.possibleShots.remove(self.possibleShots[0])#amit lövök azt kiveszem
 
                 print("LOVES",nextstep)
-                print(self.possibleShots)
+                #print(self.possibleShots)
                 print(self.myShots[-1],nextstep)
                 self.possibleDeleteindicesVertical.clear()
                 self.possibleDeleteindicesHorizontal.clear()

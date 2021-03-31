@@ -18,12 +18,14 @@ class GameVsAI:
     def game(self):
         print("Player shoot: ")
         self.glAI.responseOfMissile(self.gl1.shoot())
+        print("Table of AI")
         self.glAI.printStateForOpponent()
         print("\n")
         print("AI shoot: ")
         # AI lo
         response = self.gl1.responseOfMissile(self.AI.nextStep())
-        self.gl1.printStateForOpponent()
+        print("Table of Player")
+        self.gl1.printState()
 
         print("\n")
         while(not self.isEnd):
@@ -36,7 +38,7 @@ class GameVsAI:
             print("AI shoot: ")
             # AI lo
             response = self.gl1.responseOfMissile(self.AI.nextStep(response))
-            self.gl1.printStateForOpponent()
+            self.gl1.printState()
             if (len(self.gl1.playerOneShips) == 0): self.isEnd = True
 
             print("\n")
