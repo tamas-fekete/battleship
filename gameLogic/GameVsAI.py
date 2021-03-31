@@ -11,11 +11,9 @@ class GameVsAI:
         self.isEnd = False
 
     def initialization(self):
-        #self.glAI.readInAIShips(self.AI.placeShips())
-        aiships = self.AI.initShips()
-        print(aiships)
-        self.glAI.readInAIShips(aiships)
+        self.glAI.readInAIShips(self.AI.initShips())
         print("AI has placed its ships.")
+
         #self.gl1.readIn()
 
     def game(self):

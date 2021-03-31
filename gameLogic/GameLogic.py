@@ -99,6 +99,7 @@ class GameLogic():
         self.previousShot = prev
 
     def readInAIShips(self, AIships):
+        self.state = [hl.States.WATER] * 100
         self.playerOneShips = AIships
         ships = [item for sublist in AIships for item in sublist]
         for k in ships:
