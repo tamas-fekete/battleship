@@ -8,9 +8,12 @@ class GameLogic():
         self.opponentState = [hl.States.WATER] * 100
         # [number, size]
         # minden hajó egy list ebben a list-ben, a hajo altal felvett koordinatakat tartalmazza
-        self.ships = [[2, 1], [2,2]] #, [3,3], [2,4], [1,5]]
+        self.ships = [[2, 1], [2,2], [3,3], [2,4], [1,5]]
         # minden hajo egy list ebben a list-ben, a hajo altal felvett koordinatakat tartalmazza
-        self.playerOneShips = []
+        self.playerOneShips = [[0], [2], [4,5], [7,8], [20,21,22], [24,25,26], [40,41,42], [44,45,46,47], [60,61,62,63], [80,81,82,83,84]]
+        for sublist in self.playerOneShips:
+            for k in sublist:
+                self.state[k] = hl.States.SHIP
 
 #allapot kiirasa
     def printState(self):
@@ -37,11 +40,19 @@ class GameLogic():
         letters = ['B', 'C', 'D', 'E', 'F', 'G', 'H', 'I', 'J']
         counter = 0
         stateStr = "  1 2 3 4 5 6 7 8 9 10\nA "
+        for i in range(0,len(self.opponentState)):
+            stateStr += str(self.opponentState[i]) + " "
+            if ((i+1)%10 == 0) and (i != 99):
+                stateStr += "\n" + letters[counter] + " "
+                counter += 1
+        print(stateStr)
+
+    def printStateForMe(self):
+        letters = ['B', 'C', 'D', 'E', 'F', 'G', 'H', 'I', 'J']
+        counter = 0
+        stateStr = "  1 2 3 4 5 6 7 8 9 10\nA "
         for i in range(0,len(self.state)):
-            if self.state[i] == hl.States.SHIP:
-                stateStr += str(hl.States.WATER.value) + " "
-            else:
-                stateStr += str(self.state[i].value) + " "
+            stateStr += str(self.state[i]) + " "
             if ((i+1)%10 == 0) and (i != 99):
                 stateStr += "\n" + letters[counter] + " "
                 counter += 1

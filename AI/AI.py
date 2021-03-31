@@ -5,8 +5,6 @@ import random
 
 class AIClass:
     def __init__(self):
-        self.state = [hl.States.WATER] * 100
-        self.ships = [[2, 1], [2,2]] #, [3,3], [2,4], [1,5]]
         self.lastShot=None
         self.myShots=[]
         self.possibleShots=list(range(0,100))
@@ -19,12 +17,13 @@ class AIClass:
         self.possibleDeleteindicesVertical=[]
         self.sinkremove=[]
         self.memo=None
-        self.myShips = [[0], [15], [26, 27], [45, 55]]
-        self.initShips()
+        self.myShips = None #= [[0], [15], [26, 27], [45, 55]]
+        #self.initShips()
 
     def nextStep(self,replyfromserver=hl.States.MISSED):
         self.replyFromServer=replyfromserver
         return next(self.nextSetepGenerator)
+
     def initShips(self):
         self.myShips=[]
         possiblePositions= [i for i in range(100)]
@@ -35,7 +34,7 @@ class AIClass:
             good_dirs=[]
             while not pos_good:
                 pos = random.randint(0, 99)
-                print(pos)
+                #print(pos)
                 for size in range(sizes[i]):
                     if pos+size not in possiblePositions :
                         break
@@ -67,11 +66,11 @@ class AIClass:
 
             if sizes[i]==111:
                 need_to_be_deleted= hl.getNeighbours(pos)
-                print(need_to_be_deleted,pos)
+                #print(need_to_be_deleted,pos)
                 for j in need_to_be_deleted:
                     if j in possiblePositions:
                         possiblePositions.remove(j)
-                print(possiblePositions)
+                #print(possiblePositions)
                 nextship=[pos]
                 self.myShips.append(nextship)
             else:
@@ -87,6 +86,7 @@ class AIClass:
                 self.myShips.append(nextship)
 
         print(self.myShips)
+        return self.myShips
 
 
 
@@ -243,8 +243,8 @@ class AIClass:
 
 
 
-ai =AIClass()
-ai.initShips()
+# ai =AIClass()
+# ai.initShips()
 
 # a = AIClass()
 # print("nulladik")
