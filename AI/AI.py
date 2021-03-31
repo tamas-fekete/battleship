@@ -22,7 +22,7 @@ class AIClass:
 
     def nextStep(self,replyfromserver=hl.States.MISSED):
         self.replyFromServer=replyfromserver
-        next(self.nextSetepGenerator)
+        return next(self.nextSetepGenerator)
 
 
 
@@ -164,6 +164,7 @@ class AIClass:
                     if i in self.possibleShots:
                         print("torlom",i)
                         self.possibleShots.remove(i)
+                self.sinkremove.clear()
                 nextstep = self.possibleShots[0]
                 print(self.possibleShots)
                 self.possibleShots.remove(self.possibleShots[0])  # amit lövök azt kiveszem
@@ -177,9 +178,9 @@ class AIClass:
 
 a = AIClass()
 print("nulladik")
-a.nextStep()
+print(a.nextStep(), 0)
 print("ELSő")
-a.nextStep(hl.States.MISSED)
+print(a.nextStep(hl.States.MISSED),1)
 print("masodik")
 a.nextStep(hl.States.HIT)
 print("harmadik")
