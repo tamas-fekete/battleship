@@ -17,18 +17,7 @@ class GameVsAI:
         #self.gl1.readIn()
 
     def game(self):
-        #self.gl1.printStateForMe()
-        print("Player shoot: ")
-        response = self.glAI.responseOfMissile(self.gl1.shoot())
-        self.gl1.updateOpponentState(response)
-        print("AI shoot: ")
-        AInextshot = self.AI.nextStep()
-        responseAI = self.gl1.responseOfMissile(AInextshot)
-        print(responseAI)
-        self.glAI.setPreviousShot(AInextshot)
-        self.glAI.updateOpponentState(responseAI)
-
-        self.glAI.printState()
+        responseAI = None
 
         while(not self.isEnd):
             #self.gl1.printStateForMe()
@@ -39,7 +28,6 @@ class GameVsAI:
 
 
             print("AI shoot: ")
-            # AI lo
             AInextshot = self.AI.nextStep(responseAI)
             responseAI = self.gl1.responseOfMissile(AInextshot)
             print(responseAI)
