@@ -14,7 +14,7 @@ class GameVsAI:
         self.glAI.readInAIShips(self.AI.initShips())
         print("AI has placed its ships.")
 
-        #self.gl1.readIn()
+        self.gl1.readIn()
 
     def game(self):
         responseAI = None
@@ -36,7 +36,7 @@ class GameVsAI:
             if (len(self.gl1.playerOneShips) == 0): self.isEnd = True
 
 
-            self.glAI.printState()
+            self.gl1.printState()
 
 
 

@@ -10,10 +10,10 @@ class GameLogic():
         # minden hajó egy list ebben a list-ben, a hajo altal felvett koordinatakat tartalmazza
         self.ships = [[2, 1], [2,2], [3,3], [2,4], [1,5]]
         # minden hajo egy list ebben a list-ben, a hajo altal felvett koordinatakat tartalmazza
-        self.playerOneShips = [[0], [2], [4,5], [7,8], [20,21,22], [24,25,26], [40,41,42], [44,45,46,47], [60,61,62,63], [80,81,82,83,84]]
-        for sublist in self.playerOneShips:
-            for k in sublist:
-                self.state[k] = hl.States.SHIP
+        self.playerOneShips = [] #[[0], [2], [4,5], [7,8], [20,21,22], [24,25,26], [40,41,42], [44,45,46,47], [60,61,62,63], [80,81,82,83,84]]
+        #for sublist in self.playerOneShips:
+        #    for k in sublist:
+        #        self.state[k] = hl.States.SHIP
 
 #allapot kiirasa
     def printState(self):
@@ -34,7 +34,8 @@ class GameLogic():
             if ((i + 1) % 10 == 0) and (i != 99):
                 stateStr += "\n" + letters[counter] + " "
                 counter += 1
-        print(stateStr)
+        print(stateStr+"\n")
+
 
     def printStateForOpponent(self):
         letters = ['B', 'C', 'D', 'E', 'F', 'G', 'H', 'I', 'J']
@@ -80,12 +81,18 @@ class GameLogic():
             return hl.States.MISSED
 
     def shoot(self):
-        coordinate = input().lower()
-        if hl.validateStringCoordinate(coordinate):
-            self.previousShot = hl.stringToCoordinate(coordinate)
-            return hl.stringToCoordinate(coordinate)
-        else:
-            print("Rossz helyre lonel.")
+        while True:
+            try:
+                coordinate = input().lower()
+                if not hl.validateStringCoordinate(coordinate):
+                    raise ValueError
+            except ValueError:
+                print("exc5")
+                continue
+
+            else:
+                self.previousShot = hl.stringToCoordinate(coordinate)
+                return hl.stringToCoordinate(coordinate)
 
     def updateOpponentState(self, response):
         self.opponentState[self.previousShot] = response
@@ -106,46 +113,68 @@ class GameLogic():
             self.state[k] = hl.States.SHIP
 
     def readIn(self):
+        sizes = [[k[1] for _ in range(k[0])] for k in self.ships]
+        sizes = [item for sublist in sizes for item in sublist]
         forbiddenSpaces = set([])
-        for i in self.ships:
-            size = i[1]
-            for j in range(1, i[0]+1):
-                print("Position the " + str(j) + ". ship of size " + str(size) + "!")
-                coordinates = input().lower().split('-')
-                if hl.validateStringCoordinate(coordinates[0]) & hl.validateStringCoordinate(coordinates[1]):
-                    coordOne = hl.stringToCoordinate(coordinates[0])
-                    coordTwo = hl.stringToCoordinate(coordinates[1])
-                else: break
+        for i in sizes:
+            while True:
+                    print("Position a " + str(i) + " sized ship!")
+                    try:
+                        coordinates = input("Type the coordinates of the endpoints of your ship like this: \'A1-A1\'!\n").lower().split('-')
+                        if not (hl.validateStringCoordinate(coordinates[0]) & hl.validateStringCoordinate(coordinates[1])):
+                            raise ValueError("Not valid coordinates.")
+                        else:
+                            coordOne = hl.stringToCoordinate(coordinates[0])
+                            coordTwo = hl.stringToCoordinate(coordinates[1])
+                    except  ValueError as e:
+                        print("exc1")
+                        continue
+                    except IndexError as e2:
+                        print("exc2")
+                        continue
 
+                    try:
+                        if(coordOne%10 == coordTwo%10) and (int(abs(coordTwo - coordOne) / 10 + 1) == i):
+                            coordinates = [k for k in range(min(coordOne, coordTwo), max(coordOne, coordTwo)+10, 10)]
+                        elif (abs(coordTwo - coordOne) + 1 == i):
+                            coordinates = [k for k in range(min(coordOne, coordTwo), max(coordOne, coordTwo)+1)]
+                        else:
+                            raise ValueError("message")
+                    except ValueError:
+                        print("exc3")
+                        continue
+                            #raise ValueError("Wrong coordinates, the ship is not in a row neither in a column or has not its right size!")
 
-                if(coordOne%10 == coordTwo%10) and (int(abs(coordTwo - coordOne) / 10 + 1) == size):
-                    coordinates = [k for k in range(min(coordOne, coordTwo), max(coordOne, coordTwo)+10, 10)]
-                elif (abs(coordTwo - coordOne) + 1 == size):
-                    coordinates = [k for k in range(min(coordOne, coordTwo), max(coordOne, coordTwo)+1)]
-                else:
-                    print("Rossz koordinatak, vagy nem sorban/oszlopban van a hajo, vagy nem jo meretu!")
+                    neighbours = set([])
+                    for coord in coordinates:
+                        neighbours.update(hl.getNeighbours(coord))
+                        #[neighbours.remove(coord) for coord in coordinates]
+
+                    try:
+                        if len(forbiddenSpaces.intersection(set(coordinates))) == 0:
+                            for k in coordinates:
+                                self.state[k] = hl.States.SHIP
+                            forbiddenSpaces.update(neighbours)
+                            forbiddenSpaces.update(coordinates)
+                            self.playerOneShips.append(coordinates)
+                        else:
+                            raise ValueError("msg2")
+                    except ValueError:
+                        print("exc4")
+                        continue
+                            #raise ValueError("Wrong coordinates, you can't place ships this close to each other!")
+
+                    self.printState()
+                    # print(forbiddenSpaces)
+
+                    # print(self.playerOneShips)
                     break
+            #if i == 5: break
 
-                neighbours = set([])
-                for coord in coordinates:
-                    neighbours.update(hl.getNeighbours(coord))
-                #[neighbours.remove(coord) for coord in coordinates]
-                if len(forbiddenSpaces.intersection(set(coordinates))) == 0:
-                    for k in coordinates:
-                        self.state[k] = hl.States.SHIP
-                    forbiddenSpaces.update(neighbours)
-                    forbiddenSpaces.update(coordinates)
-                    self.playerOneShips.append(coordinates)
-                else:
-                    print("Rossz koordinatak, nem lehet ilyen kozel helyezni hajot egy masikhoz!")
-                    break
 
-                #print(forbiddenSpaces)
-                self.printState()
-                #print(self.playerOneShips)
 
 # gl = GameLogic()
-# readIn(gl)
+# gl.readIn()
 # print(gl.playerOneShips)
 # gl.printState()
 # print("Lojj kettot\n")
@@ -158,5 +187,3 @@ class GameLogic():
 # print("\n")
 # gl.step(14)
 # gl.printState()
-
-

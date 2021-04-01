@@ -85,7 +85,7 @@ class AIClass:
                             possiblePositions.remove(d)
                 self.myShips.append(nextship)
 
-        print(self.myShips)
+        #print(self.myShips)
         return self.myShips
 
 
