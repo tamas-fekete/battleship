@@ -10,7 +10,8 @@ class AIClass:
         self.possibleShots=list(range(0,100))
         random.shuffle(self.possibleShots)
         #print(self.possibleShots)
-        self.nextSetepGenerator=self.calculateNextStep()
+        self.nextStepGenerator=self.calculateNextStep()
+        self.nextStepGeneratorRandom = self.calculateNextStepRandom()
         self.replyFromServer=hl.States.MISSED
         self.myShotsReplies=[]
         self.possibleDeleteindicesHorizontal=[]
@@ -22,7 +23,7 @@ class AIClass:
 
     def nextStep(self,replyfromserver=hl.States.MISSED):
         self.replyFromServer=replyfromserver
-        return next(self.nextSetepGenerator)
+        return next(self.nextStepGenerator)
 
     def initShips(self):
         self.myShips=[]
@@ -97,174 +98,123 @@ class AIClass:
 
         # minden hajó egy list ebben a list-ben, a hajo altal felvett koordinatakat tartalmazza
 
+    def calculateNextStepRandom(self):
+        for i in self.possibleShots:
+            yield i
     def calculateNextStep(self):
         nextstep = self.possibleShots[0]
         self.possibleShots.remove(self.possibleShots[0])
-      #  print(self.possibleShots)
         self.myShots.append(nextstep)
         print("LOVES",nextstep)
-        #print(self.possibleShots)
         yield nextstep
         while True:
-
+            skip=False
             self.myShotsReplies.append(self.replyFromServer)
-            if self.replyFromServer==hl.States.MISSED:
-                print(self.myShots[-1], "NEM TALÁLT")
-                nextstep= None
-                if self.memo is None:
+            prev_hits=[]
+            for i in range(1,len(self.myShots)+1):#fontos emléket keresve
+                #print(self.myShots[-i], self.myShotsReplies[-i])
+                if self.myShotsReplies[-i]==hl.States.HIT:
+                    prev_hits.append(self.myShots[-i])
+                if self.myShotsReplies[-i]==hl.States.SINK:
+                    break
+            if len(prev_hits)>=2:
+                print("HOPHOP")
+                bigger=max(prev_hits)
+                smaller=min(prev_hits)
+                difference_between_two_hits=bigger-smaller
+                print(bigger, smaller)
+                print(difference_between_two_hits)
+                if difference_between_two_hits<10:
+                    self.memo ={bigger:bigger+1,
+                                smaller:smaller-1
+                   }
+                else:
+                    self.memo = {bigger: bigger + 10,
+                                 smaller: smaller - 10
+                                 }
+                print("MEMO MOST",self.memo)
+                for key,i in self.memo.items():
+                    print("keresem, hogy ez jó",i)
+                    print("i in poss",i in self.possibleShots)
+                    print("i in possibleship", i in hl.getPossibleShipPositions(key))
+                    if i in self.possibleShots and i in hl.getPossibleShipPositions(key):
+                        self.possibleShots.remove(i)
+                        print("FURA LOVEs",i)
+                        self.myShots.append(i)
+                        nextstep=i
+                        skip=True
+                        break
+            if skip:
+                print("okosan ez lett",nextstep)
+                yield nextstep
+
+            else:
+                if self.replyFromServer==hl.States.MISSED:
+                    print(self.myShots[-1], "NEM TALÁLT")
                     nextstep=self.possibleShots[0]
                     self.possibleShots.remove(self.possibleShots[0])
-                else:
-                    nextstep=self.memo
-                    self.possibleShots.remove(self.memo)
-                    self.memo=None
-
-                print("LOVES",nextstep)
-                #print(self.possibleShots)
-                self.myShots.append(nextstep)
-                yield nextstep
-            elif self.replyFromServer==hl.States.HIT:
-                print(self.myShots[-1], "TALÁLT")
-             #   print(len(self.myShots))
-                if len(self.myShotsReplies)>=2 and self.myShotsReplies[-2]==hl.States.HIT:
-                    if self.myShotsReplies[-2]!=hl.States.HIT:
-                        self.memo=self.possibleShots[0]
-
-                    print("EDDIGI LOVESEK",self.myShots[-1], self.myShots[-2])
-                    #print(len(self.myShotsReplies), self.myShotsReplies[-2])
-                    if self.myShots[-1] in self.possibleDeleteindicesVertical:
-                        for i in self.possibleDeleteindicesHorizontal:
-                            print("remove",i)
-                            self.possibleShots.remove(i)
-                    else:
-                        for i in self.possibleDeleteindicesVertical:
-                            print("remove", i)
+                    print("LOVES",nextstep)
+                    self.myShots.append(nextstep)
+                    yield nextstep
+                elif self.replyFromServer==hl.States.HIT:
+                    print(self.myShots[-1], "TALÁLT")
+                    preferred_indeces= hl.getPossibleShipPositions(self.myShots[-1])
+                    random.shuffle(preferred_indeces)
+                    print(self.possibleShots)
+                    delete=[]
+                    for i in preferred_indeces:
+                        if i not in self.possibleShots:
+                            delete.append(i)
+                        else:
                             self.possibleShots.remove(i)
 
-                preferred_indeces= hl.getPossibleShipPositions(self.myShots[-1])
-                for i in preferred_indeces:
-                    self.sinkremove.append(i)
-                random.shuffle(preferred_indeces)
+                    for i in delete:
+                        preferred_indeces.remove(i)
+                    print(preferred_indeces)
+                    self.possibleShots=preferred_indeces+self.possibleShots
+                    # for i in range(len(preferred_indeces)):
+                    #     if preferred_indeces[i] in self.possibleShots:
+                    #         tmp = self.possibleShots[i]
+                    #         self.possibleShots.remove(preferred_indeces[i])
+                    #         self.possibleShots[i] = preferred_indeces[i]
+                    #         self.possibleShots.append(tmp)
+                    print(self.possibleShots)
+                    nextstep = self.possibleShots[0]
+                    self.possibleShots.remove(self.possibleShots[0])#amit lövök azt kiveszem
+                    print("LOVES",nextstep)
+                    self.myShots.append(nextstep)
+                    yield nextstep
 
+                elif self.replyFromServer==hl.States.SINK:
 
+                    print(self.myShots[-1], "SINK")
+                    need_to_be_deleted=[]
+                    need_to_be_deleted.append(self.myShots[-1])
+                    for i in range(2, len(self.myShots) + 1):  # fontos emléket keresve
+                        print(self.myShots[-i], self.myShotsReplies[-i])
+                        if self.myShotsReplies[-i] == hl.States.HIT:
+                            need_to_be_deleted.append(self.myShots[-i])
+                        if self.myShotsReplies[-i] == hl.States.SINK:
+                            break
+                    print("HOPHOPppppsink")
+                    for i in need_to_be_deleted:
+                        for d in hl.getNeighbours(i):
+                            if d in self.possibleShots:
+                                print("törlöm",d)
+                                self.possibleShots.remove(d)
 
-                print(preferred_indeces)
-                #print(self.possibleShots)
-                need_to_be_deleted=[]
-                for i in range (len(preferred_indeces)):#change positions
-                    Need= True
-                    if preferred_indeces[i] in self.possibleShots:
-                        if len(self.myShotsReplies) >= 2 and self.myShotsReplies[-2] == hl.States.HIT:
-                            #print(self.myShots[-1],self.myShots[-2])
-                            print(
-                                "elozo loves " + str(self.myShots[-1]) + " vizsgalt elem " + str(preferred_indeces[i]))
-                            if abs(self.myShots[-1]-self.myShots[-2])>=10:
-                                if abs(preferred_indeces[i] - self.myShots[-1]) < 10:
-                                    print("ez most horizontalis szomszéd ezért torlom.", preferred_indeces[i])
-                                    need_to_be_deleted.append(preferred_indeces[i])
-                                 #   preferred_indeces.remove(preferred_indeces[i])
-                                    continue
-                            else:
-                                if abs(preferred_indeces[i] - self.myShots[-1]) >= 10:
-                                    print("ez most vertikalis szomszéd ezért torlom.", preferred_indeces[i])
-                                    need_to_be_deleted.append(preferred_indeces[i])
-                                  #  preferred_indeces.remove(preferred_indeces[i])
-                                    continue
+                    nextstep=self.possibleShots[0]
+                    self.possibleShots.remove(nextstep)
+                    print("SINK LOVES", nextstep)
+                    self.myShots.append(nextstep)
+                    yield nextstep
 
-
-
-
-
-
-
-
-                for i in need_to_be_deleted:
-                    preferred_indeces.remove(i)
-                    print("remove",i)
-                    self.possibleShots.remove(i)
-                #ha lenne emlékben valami fontos:
-               # mem = self.possibleShots[0]
-                #self.possibleShots[0] = self.possibleShots[1]
-                #self.possibleShots[1] = mem
-
-                for i in range(len(preferred_indeces)):
-                    if preferred_indeces[i] in self.possibleShots:
-                        #tmpind = self.possibleShots.index(preferred_indeces[i])
-                        tmp = self.possibleShots[i]
-                        self.possibleShots.remove(preferred_indeces[i])
-
-
-                        self.possibleShots[i] = preferred_indeces[i]
-                        self.possibleShots.append(tmp)
-
-                nextstep = self.possibleShots[0]
-                #print(self.possibleShots)
-                self.possibleShots.remove(self.possibleShots[0])#amit lövök azt kiveszem
-
-                print("LOVES",nextstep)
-                #print(self.possibleShots)
-                print(self.myShots[-1],nextstep)
-                self.possibleDeleteindicesVertical.clear()
-                self.possibleDeleteindicesHorizontal.clear()
-                for i in range(len(preferred_indeces)):  # change positions
-                    if abs(preferred_indeces[i] - self.myShots[-1]) >= 10:
-                        self.possibleDeleteindicesHorizontal.append(preferred_indeces[i])
-                    else:
-                        self.possibleDeleteindicesVertical.append(preferred_indeces[i])
-
-                print(self.possibleDeleteindicesVertical,self.possibleDeleteindicesHorizontal)
-                self.myShots.append(nextstep)
-                yield nextstep
-
-
-
-
-
-            elif self.replyFromServer==hl.States.SINK:
-                print(self.myShots[-1], "SINK")
-                preferred_indeces = hl.getPossibleShipPositions(self.myShots[-1])
-                for i in preferred_indeces:
-                    if i in self.possibleShots:
-                        print("torlom",i)
-                        self.possibleShots.remove(i)
-                for i in self.sinkremove:
-                    if i in self.possibleShots:
-                        print("torlom",i)
-                        self.possibleShots.remove(i)
-                nextstep = self.possibleShots[0]
-                print(self.possibleShots)
-                self.possibleShots.remove(self.possibleShots[0])  # amit lövök azt kiveszem
-                print("LOVES", nextstep)
-                yield nextstep
 
     def placeShips(self):
         return self.myShips
 
 
 
-
-# ai =AIClass()
-# ai.initShips()
-
-# a = AIClass()
-# print("nulladik")
-# a.nextStep()
-# print("ELSő")
-# a.nextStep(hl.States.MISSED)
-# print("masodik")
-# a.nextStep(hl.States.HIT)
-# print("harmadik")
-# a.nextStep(hl.States.HIT)
-# print("negyedik")
-# a.nextStep(hl.States.MISSED)
-# print("otodik")
-# a.nextStep(hl.States.HIT)
-# print("hatodik")
-# a.nextStep(hl.States.SINK)
-# print("hetedik")
-# a.nextStep(hl.States.MISSED)
-# print("nyolcadik")
-# a.nextStep(hl.States.MISSED)
 
 
 
