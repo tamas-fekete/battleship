@@ -2,20 +2,17 @@ from helper import helper as hl
 
 # GameLogic osztaly: sorfolytonos repr. allapot, jatekosok hajoinak tarolasa, szukseges hajok
 class GameLogic():
-    def __init__(self):
+    def __init__(self, gameVsAI):
         self.previousShot = None
         self.state = [hl.States.WATER]*100
         self.opponentState = [hl.States.WATER] * 100
-        # [number, size]
-        # minden hajó egy list ebben a list-ben, a hajo altal felvett koordinatakat tartalmazza
+        self.gameVsAI = gameVsAI
         self.ships = [[2, 1], [2,2], [3,3], [2,4], [1,5]]
-        # minden hajo egy list ebben a list-ben, a hajo altal felvett koordinatakat tartalmazza
-        self.playerOneShips = [] #[[0], [2], [4,5], [7,8], [20,21,22], [24,25,26], [40,41,42], [44,45,46,47], [60,61,62,63], [80,81,82,83,84]]
-        #for sublist in self.playerOneShips:
-        #    for k in sublist:
-        #        self.state[k] = hl.States.SHIP
+        self.playerOneShips = [[0], [2], [4,5], [7,8], [20,21,22], [24,25,26], [40,41,42], [44,45,46,47], [60,61,62,63], [80,81,82,83,84]]
+        for sublist in self.playerOneShips:
+            for k in sublist:
+                self.state[k] = hl.States.SHIP
 
-#allapot kiirasa
     def printState(self):
         letters = ['B', 'C', 'D', 'E', 'F', 'G', 'H', 'I', 'J']
         counter = 0
@@ -34,8 +31,8 @@ class GameLogic():
             if ((i + 1) % 10 == 0) and (i != 99):
                 stateStr += "\n" + letters[counter] + " "
                 counter += 1
-        print(stateStr+"\n")
-
+        #print(stateStr+"\n")
+        return stateStr + "\n"
 
     def printStateForOpponent(self):
         letters = ['B', 'C', 'D', 'E', 'F', 'G', 'H', 'I', 'J']
@@ -53,11 +50,12 @@ class GameLogic():
         counter = 0
         stateStr = "  1 2 3 4 5 6 7 8 9 10\nA "
         for i in range(0,len(self.state)):
-            stateStr += str(self.state[i]) + " "
+            stateStr += str(self.state[i].value) + " "
             if ((i+1)%10 == 0) and (i != 99):
                 stateStr += "\n" + letters[counter] + " "
                 counter += 1
-        print(stateStr)
+        #print(stateStr)
+        return stateStr + '\n'
 
     def responseOfMissile(self, coord):
         if self.state[coord] == hl.States.SHIP:
@@ -83,7 +81,7 @@ class GameLogic():
     def shoot(self):
         while True:
             try:
-                coordinate = input().lower()
+                coordinate = self.gameVsAI.playerCommunicator.shoot()
                 if not hl.validateStringCoordinate(coordinate):
                     raise ValueError
             except ValueError:
@@ -120,7 +118,7 @@ class GameLogic():
             while True:
                     print("Position a " + str(i) + " sized ship!")
                     try:
-                        coordinates = input("Type the coordinates of the endpoints of your ship like this: \'A1-A1\'!\n").lower().split('-')
+                        coordinates = self.gameVsAI.playerCommunicator.readIn()
                         if not (hl.validateStringCoordinate(coordinates[0]) & hl.validateStringCoordinate(coordinates[1])):
                             raise ValueError("Not valid coordinates.")
                         else:
@@ -168,9 +166,9 @@ class GameLogic():
                     # print(forbiddenSpaces)
 
                     # print(self.playerOneShips)
+                    self.gameVsAI.printStateForMe(self.printStateForMe())
                     break
             #if i == 5: break
-
 
 
 # gl = GameLogic()

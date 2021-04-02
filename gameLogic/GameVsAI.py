@@ -3,43 +3,50 @@ from gameLogic.GameLogic import GameLogic
 
 
 class GameVsAI:
-    def __init__(self):
-        self.gl1 = GameLogic()
-        self.glAI = GameLogic()
+    def __init__(self, playerCommunicator):
+        self.gameLogic = GameLogic(self)
+        self.gameLogicAI = GameLogic(self)
         self.AI = AIClass()
+        self.playerCommunicator = playerCommunicator
         self.initialization()
         self.isEnd = False
+        self.winner = None
 
     def initialization(self):
-        self.glAI.readInAIShips(self.AI.initShips())
+        self.gameLogicAI.readInAIShips(self.AI.initShips())
         print("AI has placed its ships.")
 
-        self.gl1.readIn()
+        self.playerCommunicator.setGameVsAI(self)
+        #self.gameLogic.readIn()
 
     def game(self):
         responseAI = None
 
         while(not self.isEnd):
-            #self.gl1.printStateForMe()
-            print("Player shoot: ")
-            response = self.glAI.responseOfMissile(self.gl1.shoot())
-            self.gl1.updateOpponentState(response)
-            if(len(self.glAI.playerOneShips) == 0): self.isEnd = True
+            response = self.gameLogicAI.responseOfMissile(self.gameLogic.shoot())
+            self.gameLogic.updateOpponentState(response)
+            if(len(self.gameLogicAI.playerOneShips) == 0):
+                self.isEnd = True
+                self.winner = "You"
 
-
-            print("AI shoot: ")
             AInextshot = self.AI.nextStep(responseAI)
-            responseAI = self.gl1.responseOfMissile(AInextshot)
-            print(responseAI)
-            self.glAI.setPreviousShot(AInextshot)
-            self.glAI.updateOpponentState(responseAI)
-            if (len(self.gl1.playerOneShips) == 0): self.isEnd = True
+            self.printStateForMe("AI shoot: ")  #TODO az indexet vissza kell alakítani koordinátává
+            responseAI = self.gameLogic.responseOfMissile(AInextshot)
+            #print(responseAI)
+            self.gameLogicAI.setPreviousShot(AInextshot)
+            self.gameLogicAI.updateOpponentState(responseAI)
+            if (len(self.gameLogic.playerOneShips) == 0):
+                self.isEnd = True
+                self.winner = "AI"
 
 
-            self.gl1.printState()
+            self.playerCommunicator.printState(self.gameLogic.printState())
+
+        self.playerCommunicator.printState("The winner is " + self.winner)
 
 
 
-asd = GameVsAI()
-asd.game()
+    def printStateForMe(self, state):
+        self.playerCommunicator.printState(state)
+
 
