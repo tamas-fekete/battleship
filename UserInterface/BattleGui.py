@@ -68,6 +68,16 @@ class BattleGui(tk.Frame):
         self.textBox = tk.Text(width=40, height=1)
         self.textBox.pack()
         
+        #creating menus:
+        menu = tk.Menu(self.master)
+        self.master.config(menu=menu)
+        
+        file = tk.Menu(menu)
+        file.add_command(label="play on network")
+        file.add_command(label="play against AI")
+        file.add_command(label="Exit", command=self.clientExit)
+        menu.add_cascade(label="File", menu=file)
+        
         
         self.pack()
         
@@ -78,7 +88,8 @@ class BattleGui(tk.Frame):
         self.textBox.delete("1.0",tk.END)
         self.textBox.insert(tk.END, myInput+"\n")
         
-    
+    def clientExit(self):
+        exit()
 
 
 def main():
