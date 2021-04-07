@@ -16,30 +16,19 @@ class Board(tk.Canvas):
 
 
     def initBoard(self,imageBackground):
-        '''initializes game'''
-
-        self.loadImages(imageBackground)
-        self.createObjects()
-   
-
-
-    def loadImages(self, imageBackground):
-        '''loads images from the disk'''
 
         try:
-            
             self.background = ImageTk.PhotoImage(imageBackground)
-
         except IOError as e:
-
             print(e)
             sys.exit(1)
-            
-            
-    def createObjects(self):
-        '''creates objects on Canvas'''
+        
         self.create_image(0, 0, image=self.background, anchor=tk.NW,  tag="background")
+
           
+    def putImageOnCanvas(self, image, x, y, tagName):
+    
+        self.create_image(x, y, image=image, anchor=tk.NW,  tag=tagName)
         
 
 
@@ -56,9 +45,20 @@ class BattleGui(tk.Frame):
         
         self.entry = tk.Entry()
         self.entry.pack()
+
         
         self.boardShips = Board(Image.open("sprites/oceangrid_final.png"))
         self.radarShips = Board(Image.open("sprites/radargrid_final.png"))
+                
+        self.loadImages()
+        #put a few sprites on the canvas:
+        
+        self.boardShips.putImageOnCanvas(self.green, 31, 31, "green")
+        self.boardShips.putImageOnCanvas(self.ship3vertical, 93,93, "ship3vertical")
+        self.radarShips.putImageOnCanvas(self.red, 62, 62, "red")
+        self.radarShips.putImageOnCanvas(self.hit, 93, 93, "hit")
+        
+        
         
         self.boardShips.pack(side=tk.LEFT, expand="true")
         self.radarShips.pack(side=tk.RIGHT, expand="true")
@@ -81,6 +81,29 @@ class BattleGui(tk.Frame):
         
         self.pack()
         
+        
+    def loadImages(self):
+
+        try:
+            self.igreen = Image.open("sprites/green.png")
+            self.green = ImageTk.PhotoImage(self.igreen)
+            
+            self.ired = Image.open("sprites/red.png")
+            self.red = ImageTk.PhotoImage(self.ired)
+            
+            self.ihit = Image.open("sprites/hit.png")
+            self.hit = ImageTk.PhotoImage(self.ihit)
+            
+            self.iship3vertical = Image.open("sprites/3vertical.png")
+            self.ship3vertical = ImageTk.PhotoImage(self.iship3vertical)
+            
+            self.iship4horizontal = Image.open("sprites/4horizontal.png")
+            self.ship4horizontal = ImageTk.PhotoImage(self.iship4horizontal)
+
+        except IOError as e:
+            print(e)
+            exit(1)
+         
         
     def onEnter(self, event):
         myInput = self.entry.get()
