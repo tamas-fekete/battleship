@@ -77,6 +77,19 @@ class States(Enum):
     HIT = 3
     SINK = 4
 
+class shipOrientation(Enum):
+    HORIZONTAl = 0
+    VERTICAL = 1
+
+class guiShip():
+    def __init__(self):
+        self.size=0
+        self.startingCoordinate=0
+        self.orientation=None
+    
+
+
+
 # this function will check if the string is a valid coordinate
 # input: string
 # return value: boolen, true if the string is a valid coordinate and false if it is not
