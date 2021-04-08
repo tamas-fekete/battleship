@@ -62,12 +62,6 @@ class BattleGui(tk.Frame):
         self.gameLogicAI.readInAIShips(self.AI.initShips())
         self.responseAI = None
         self.loadImages()
-        # put a few sprites on the canvas:
-
-        # self.boardShips.putImageOnCanvas(self.green, 31, 31, "green")
-        # self.boardShips.putImageOnCanvas(self.ship3vertical, 93,93, "ship3vertical")
-        # self.radarShips.putImageOnCanvas(self.red, 62, 62, "red")
-        # self.radarShips.putImageOnCanvas(self.hit, 93, 93, "hit")
 
         self.boardShips.pack(side=tk.LEFT, expand="true")
         self.radarShips.pack(side=tk.RIGHT, expand="true")
@@ -148,7 +142,6 @@ class BattleGui(tk.Frame):
         self.radarSprites.extend([0, 1, self.miss, self.hit, self.sink])
         self.oceanSprites.extend([0, 1, self.miss2, self.sink, self.sink])
 
-
     def onEnter(self, event):
         self.myInput = self.entry.get()
         self.entry.delete(0, tk.END)
@@ -215,16 +208,15 @@ class BattleGui(tk.Frame):
         for coordinate, state in enumerate(states):
             if state == hl.States.MISSED or state == hl.States.HIT or state == hl.States.SINK:
                 pixelCoords = self.coordinateToPixel(coordinate)
-                self.boardShips.putImageOnCanvas(self.oceanSprites[int(state)], pixelCoords[0], pixelCoords[1],
+                self.boardShips.putImageOnCanvas(self.oceanSprites[state], pixelCoords[0], pixelCoords[1],
                                                  "sprite" + str(pixelCoords[0]) + str(pixelCoords[1]))
 
     def updateRadar(self, opponentState):
         for coordinate, state in enumerate(opponentState):
             if state == hl.States.MISSED or state == hl.States.HIT or state == hl.States.SINK:
                 pixelCoords = self.coordinateToPixel(coordinate)
-                self.radarShips.putImageOnCanvas(self.radarSprites[int(state)], pixelCoords[0], pixelCoords[1],
+                self.radarShips.putImageOnCanvas(self.radarSprites[state], pixelCoords[0], pixelCoords[1],
                                                  "sprite"+str(pixelCoords[0])+str(pixelCoords[1]))
-
 
     def coordinateToPixel(self, coordinate):
         pixelCoords = []
