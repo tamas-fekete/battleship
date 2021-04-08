@@ -132,8 +132,10 @@ class GameLogic():
                         continue
 
                     try:
-                        if(coordOne%10 == coordTwo%10) and (int(abs(coordTwo - coordOne) / 10 + 1) == i):
+                        #check if ship is vertical:
+                        if(coordOne%10 == coordTwo%10) and (int(abs(coordTwo - coordOne) / 10 + 1) == i): 
                             coordinates = [k for k in range(min(coordOne, coordTwo), max(coordOne, coordTwo)+10, 10)]
+                        #check if ship is horizontal:
                         elif (abs(coordTwo - coordOne) + 1 == i):
                             coordinates = [k for k in range(min(coordOne, coordTwo), max(coordOne, coordTwo)+1)]
                         else:
