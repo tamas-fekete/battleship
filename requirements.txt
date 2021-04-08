@@ -1,3 +1,4 @@
 pytest
 pytest-cov
 coverage
+Pillow~=8.2.0
