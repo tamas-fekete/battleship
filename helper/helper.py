@@ -1,7 +1,7 @@
 import re
 from enum import Enum
 # helper functions
-
+from enum import IntEnum
 
 # this function will convert a string to coordinates
 # input: string
@@ -70,14 +70,15 @@ def getPossibleShipPositions(coordinate):
     return lis
 
 
-class States(Enum):
+class States(IntEnum):
     WATER = 0
     SHIP = 1
     MISSED = 2
     HIT = 3
     SINK = 4
 
-class shipOrientation(Enum):
+
+class shipOrientation(IntEnum):
     HORIZONTAl = 0
     VERTICAL = 1
 

@@ -7,9 +7,8 @@ class GameLogic():
         self.state = [hl.States.WATER] * 100
         self.opponentState = [hl.States.WATER] * 100
         self.gameVsAI = gameVsAI
-        self.ships = [[2, 1], [2, 2], [3, 3], [2, 4], [1, 5]]
-        self.playerOneShips = [[0], [2], [4, 5], [7, 8], [20, 21, 22], [24, 25, 26], [40, 41, 42], [44, 45, 46, 47],
-                               [60, 61, 62, 63], [80, 81, 82, 83, 84]]
+        self.ships = [[2, 1], [1, 5]] # self.ships = [[2, 1], [2, 2], [3, 3], [2, 4], [1, 5]]
+        self.playerOneShips = []
         self.forbiddenSpaces = set([])
         self.gameState = 0
         self.gui = gui
@@ -83,15 +82,14 @@ class GameLogic():
             self.state[coord] = hl.States.MISSED
             return hl.States.MISSED
 
-    def shoot(self):
+    def shoot(self, coordinate):
         while True:
             try:
-                coordinate = self.gameVsAI.playerCommunicator.shoot()
                 if not hl.validateStringCoordinate(coordinate):
                     raise ValueError
             except ValueError:
                 print("exc5")
-                continue
+                return False
 
             else:
                 self.previousShot = hl.stringToCoordinate(coordinate)
@@ -175,7 +173,7 @@ class GameLogic():
             return guiShip
             # raise ValueError("Wrong coordinates, you can't place ships this close to each other!")
 
-        self.printState()
+        print(self.printState())
         # print(forbiddenSpaces)
 
         # print(self.playerOneShips)
@@ -183,10 +181,9 @@ class GameLogic():
         self.j +=1
         guiShip.successful = True   # ship was successfully placed, we need to send it back to the gui
         if i == 5:  # this is the last ship, readIn function no longer needs to be called
-            self.gameState = 1 # change game state
-
+            self.gameState = 1  # change game state
+            print(self.printState())
         return guiShip
-
 
     def getGameState(self):
 

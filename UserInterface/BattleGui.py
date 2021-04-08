@@ -2,6 +2,7 @@ import tkinter as tk
 from PIL import Image, ImageTk
 from helper import helper as hl
 from gameLogic.GameLogic import GameLogic
+from AI.AI import AIClass
 
 class Cons:
     BOARD_WIDTH = 342
@@ -50,10 +51,16 @@ class BattleGui(tk.Frame):
         self.boardShips = Board(Image.open("sprites/oceangrid_final.png"))
         self.radarShips = Board(Image.open("sprites/radargrid_final.png"))
 
+        self.winner = None
         self.myInput = None     # az elejen ebben a valtozoban lesz elmentve a letenni kivant hajo, aztan pedig a loves koordinataja
         self.shipSprites = []
+        self.radarSprites = []
+        self.oceanSprites = []
         self.gameLogic = GameLogic(None, self)
-
+        self.gameLogicAI = GameLogic(None, self)
+        self.AI = AIClass()
+        self.gameLogicAI.readInAIShips(self.AI.initShips())
+        self.responseAI = None
         self.loadImages()
         # put a few sprites on the canvas:
 
@@ -85,14 +92,17 @@ class BattleGui(tk.Frame):
     def loadImages(self):
 
         try:
-            self.igreen = Image.open("sprites/green.png")
-            self.green = ImageTk.PhotoImage(self.igreen)
-
-            self.ired = Image.open("sprites/red.png")
-            self.red = ImageTk.PhotoImage(self.ired)
-
             self.ihit = Image.open("sprites/hit.png")
             self.hit = ImageTk.PhotoImage(self.ihit)
+
+            self.imiss = Image.open("sprites/miss.png")
+            self.miss = ImageTk.PhotoImage(self.imiss)
+
+            self.imiss2 = Image.open("sprites/miss2.png")
+            self.miss2 = ImageTk.PhotoImage(self.imiss2)
+
+            self.isink = Image.open("sprites/sink.png")
+            self.sink = ImageTk.PhotoImage(self.isink)
 
             self.iship1vertical = Image.open("sprites/1vertical.png")
             self.ship1vertical = ImageTk.PhotoImage(self.iship1vertical)
@@ -135,6 +145,9 @@ class BattleGui(tk.Frame):
         dict4 = {hl.shipOrientation.HORIZONTAl: self.ship4horizontal, hl.shipOrientation.VERTICAL: self.ship4vertical}
         dict5 = {hl.shipOrientation.HORIZONTAl: self.ship5horizontal, hl.shipOrientation.VERTICAL: self.ship5vertical}
         self.shipSprites.extend([dict1, dict2, dict3, dict4, dict5])
+        self.radarSprites.extend([0, 1, self.miss, self.hit, self.sink])
+        self.oceanSprites.extend([0, 1, self.miss2, self.sink, self.sink])
+
 
     def onEnter(self, event):
         self.myInput = self.entry.get()
@@ -149,11 +162,69 @@ class BattleGui(tk.Frame):
 
                 self.boardShips.putImageOnCanvas(self.shipSprites[ship.size-1][ship.orientation], pixelCoords[0], pixelCoords[1],
                                                  "ship"+str(ship.size)+str(ship.orientation))
-            else: pass #notify user that ship placement was unsuccessful
+            else:
+                pass  # notify user that ship placement was unsuccessful
 
+        elif self.gameLogic.gameState == 1:   # game started against opponent
+
+            # jatekos lo az AI-ra es az AI megmondja, hogy hit, miss vagy sink:
+            response = self.gameLogicAI.responseOfMissile(self.gameLogic.shoot(self.myInput))
+            self.gameLogic.updateOpponentState(response)
+            self.updateRadar(self.gameLogic.opponentState)
+            # csalas:
+            print(self.gameLogicAI.printState())
+
+            # ha az AI-nak elfogytak a hajoi, akkor nyert a jatekos
+            if len(self.gameLogicAI.playerOneShips) == 0:
+                self.gameLogic.gameState = 2
+                self.winner = "You"
+                self.textBox.delete("1.0", tk.END)
+                self.textBox.insert(tk.END, "You win, congrats!" + "\n")
+
+            # a deepmind klon kiszamolja a kovetkezo lepeset
+            AInextshot = self.AI.nextStep(self.responseAI)
+            # self.printStateForMe("AI shoot: ")  # TODO az indexet vissza kell alakítani koordinátává
+
+            # az AI lovesere reagal a jatekos
+            self.responseAI = self.gameLogic.responseOfMissile(AInextshot)
+
+            # updatelni kell az ocean grid-et:
+            self.updateOcean(self.gameLogic.state)
+
+            self.gameLogicAI.setPreviousShot(AInextshot)  # lementeni az AI-nak az AI elozo loveset
+            self.gameLogicAI.updateOpponentState(self.responseAI)  # az AI radarjat updatelni
+
+            # ha elfogytak a jatekos hajoi, akkor az AI nyert
+            if len(self.gameLogic.playerOneShips) == 0:
+                self.gameLogic.gameState = 2
+                self.winner = "AI"
+                self.textBox.delete("1.0", tk.END)
+                self.textBox.insert(tk.END, "The AI owned you, you lose!" + "\n")
+
+        elif self.gameLogic.gameState == 2:
+            self.textBox.delete("1.0", tk.END)
+            if self.winner == "AI":
+                self.textBox.insert(tk.END, "The AI owned you, you lose!" + "\n")
+            elif self.winner == "You":
+                self.textBox.insert(tk.END, "You win, congrats!" + "\n")
 
     def getInput(self):
         return self.myInput
+
+    def updateOcean(self, states):
+        for coordinate, state in enumerate(states):
+            if state == hl.States.MISSED or state == hl.States.HIT or state == hl.States.SINK:
+                pixelCoords = self.coordinateToPixel(coordinate)
+                self.boardShips.putImageOnCanvas(self.oceanSprites[int(state)], pixelCoords[0], pixelCoords[1],
+                                                 "sprite" + str(pixelCoords[0]) + str(pixelCoords[1]))
+
+    def updateRadar(self, opponentState):
+        for coordinate, state in enumerate(opponentState):
+            if state == hl.States.MISSED or state == hl.States.HIT or state == hl.States.SINK:
+                pixelCoords = self.coordinateToPixel(coordinate)
+                self.radarShips.putImageOnCanvas(self.radarSprites[int(state)], pixelCoords[0], pixelCoords[1],
+                                                 "sprite"+str(pixelCoords[0])+str(pixelCoords[1]))
+
 
     def coordinateToPixel(self, coordinate):
         pixelCoords = []
