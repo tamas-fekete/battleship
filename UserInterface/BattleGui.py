@@ -1,11 +1,13 @@
 import tkinter as tk
 from PIL import Image, ImageTk
 from helper import helper as hl
-
+from gameLogic.GameLogic import GameLogic
 
 class Cons:
     BOARD_WIDTH = 342
     BOARD_HEIGHT = 342
+    TILE_HEIGHT = 32
+    TILE_WIDTH = 32
 
 
 class Board(tk.Canvas):
@@ -48,13 +50,17 @@ class BattleGui(tk.Frame):
         self.boardShips = Board(Image.open("sprites/oceangrid_final.png"))
         self.radarShips = Board(Image.open("sprites/radargrid_final.png"))
 
+        self.myInput = None     # az elejen ebben a valtozoban lesz elmentve a letenni kivant hajo, aztan pedig a loves koordinataja
+        self.shipSprites = []
+        self.gameLogic = GameLogic(None, self)
+
         self.loadImages()
         # put a few sprites on the canvas:
 
-        self.boardShips.putImageOnCanvas(self.green, 31, 31, "green")
+        # self.boardShips.putImageOnCanvas(self.green, 31, 31, "green")
         # self.boardShips.putImageOnCanvas(self.ship3vertical, 93,93, "ship3vertical")
-        self.radarShips.putImageOnCanvas(self.red, 62, 62, "red")
-        self.radarShips.putImageOnCanvas(self.hit, 93, 93, "hit")
+        # self.radarShips.putImageOnCanvas(self.red, 62, 62, "red")
+        # self.radarShips.putImageOnCanvas(self.hit, 93, 93, "hit")
 
         self.boardShips.pack(side=tk.LEFT, expand="true")
         self.radarShips.pack(side=tk.RIGHT, expand="true")
@@ -122,8 +128,7 @@ class BattleGui(tk.Frame):
             print(e)
             exit(1)
 
-        #create a list of dictionaries from the ships:
-        self.shipSprites = []
+        # create a list of dictionaries from the ships:
         dict1 = {hl.shipOrientation.HORIZONTAl: self.ship1horizontal, hl.shipOrientation.VERTICAL: self.ship1vertical}
         dict2 = {hl.shipOrientation.HORIZONTAl: self.ship2horizontal, hl.shipOrientation.VERTICAL: self.ship2vertical}
         dict3 = {hl.shipOrientation.HORIZONTAl: self.ship3horizontal, hl.shipOrientation.VERTICAL: self.ship3vertical}
@@ -131,25 +136,40 @@ class BattleGui(tk.Frame):
         dict5 = {hl.shipOrientation.HORIZONTAl: self.ship5horizontal, hl.shipOrientation.VERTICAL: self.ship5vertical}
         self.shipSprites.extend([dict1, dict2, dict3, dict4, dict5])
 
-
     def onEnter(self, event):
-        myInput = self.entry.get()
+        self.myInput = self.entry.get()
         self.entry.delete(0, tk.END)
         self.textBox.delete("1.0", tk.END)
-        self.textBox.insert(tk.END, myInput + "\n")
+        self.textBox.insert(tk.END, self.myInput + "\n")
 
-        ship = self.returnWithShip()
-        # ez alapjan a hajo alapjan kikeressuk a dictionary-bol, hogy melyik hajot szeretnenk abrazolni
-        # a ship-nek sorfolytonos koordinataja lesz, ehhez is kelle egy fuggveny, ami atrakja pixel koordinatakba:
-        # utana pedig kirakjuk a hajot
-        self.boardShips.putImageOnCanvas(self.shipSprites[ship.size-1][ship.orientation], 93, 93,
-                                         "ship"+str(ship.size)+str(ship.orientation))
+        if self.gameLogic.gameState == 0:  # init state
+            ship = self.gameLogic.readIn()
+            if ship.successful:
+                pixelCoords = self.coordinateToPixel(ship.startingCoordinate)
 
-    def returnWithShip(self):
+                self.boardShips.putImageOnCanvas(self.shipSprites[ship.size-1][ship.orientation], pixelCoords[0], pixelCoords[1],
+                                                 "ship"+str(ship.size)+str(ship.orientation))
+            else: pass #notify user that ship placement was unsuccessful
+
+
+    def getInput(self):
+        return self.myInput
+
+    def coordinateToPixel(self, coordinate):
+        pixelCoords = []
+        x = coordinate % 10
+        y = int(coordinate / 10)
+
+        x = (Cons.TILE_WIDTH-1)*x + (Cons.TILE_WIDTH-1)
+        y = (Cons.TILE_HEIGHT-1)*y + (Cons.TILE_HEIGHT-1)
+        pixelCoords.extend([x, y])
+        return pixelCoords
+
+    def returnWithShip(self):  # ez csak teszteleshez kellett
         ship = hl.guiShip()
         ship.size = 5
-        ship.coordinates = 8
-        ship.orientation = hl.shipOrientation.VERTICAL
+        ship.startingCoordinate = 12
+        ship.orientation = hl.shipOrientation.HORIZONTAl
         return ship
 
     def clientExit(self):
