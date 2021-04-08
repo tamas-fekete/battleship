@@ -86,6 +86,7 @@ class guiShip():
         self.size=0
         self.startingCoordinate=0
         self.orientation=None
+        self.successful = False
     
 
 
