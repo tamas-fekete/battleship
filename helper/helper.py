@@ -9,7 +9,7 @@ from enum import IntEnum
 
 def stringToCoordinate(strCoord):
     coordinates = []
-    
+
     y = ord(strCoord[0]) - ord('a')
     x = int(strCoord[1:])-1
 
@@ -82,19 +82,18 @@ class shipOrientation(IntEnum):
     HORIZONTAl = 0
     VERTICAL = 1
 
+
 class guiShip():
     def __init__(self):
-        self.size=0
-        self.startingCoordinate=0
-        self.orientation=None
+        self.size = 0
+        self.startingCoordinate = 0
+        self.orientation = None
         self.successful = False
-    
-
-
 
 # this function will check if the string is a valid coordinate
 # input: string
 # return value: boolen, true if the string is a valid coordinate and false if it is not
+
 
 def validateStringCoordinate(strCoord):
     if re.search("^[a-j][1-9]$|^[a-j]10$", strCoord) is None:
