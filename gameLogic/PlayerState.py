@@ -1,6 +1,8 @@
 from helper import helper as hl
 
 # GameLogic osztaly: sorfolytonos repr. allapot, jatekosok hajoinak tarolasa, szukseges hajok
+
+
 class GameLogic():
     def __init__(self, gameVsAI, gui):
         self.previousShot = None
