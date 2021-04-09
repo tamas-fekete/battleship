@@ -247,6 +247,7 @@ class BattleGui(tk.Frame):
 
 def main():
     root = tk.Tk()
+    root.iconbitmap("sprites/sonar.ico")
     BattleGui()
     root.mainloop()
 
