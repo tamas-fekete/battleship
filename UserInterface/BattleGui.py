@@ -98,6 +98,9 @@ class BattleGui(tk.Frame):
             self.isink = Image.open("sprites/sink.png")
             self.sink = ImageTk.PhotoImage(self.isink)
 
+            self.isink2 = Image.open("sprites/sink2.png")
+            self.sink2 = ImageTk.PhotoImage(self.isink2)
+
             self.iship1vertical = Image.open("sprites/1vertical.png")
             self.ship1vertical = ImageTk.PhotoImage(self.iship1vertical)
 
@@ -140,7 +143,7 @@ class BattleGui(tk.Frame):
         dict5 = {hl.shipOrientation.HORIZONTAl: self.ship5horizontal, hl.shipOrientation.VERTICAL: self.ship5vertical}
         self.shipSprites.extend([dict1, dict2, dict3, dict4, dict5])
         self.radarSprites.extend([0, 1, self.miss, self.hit, self.sink])
-        self.oceanSprites.extend([0, 1, self.miss2, self.sink, self.sink])
+        self.oceanSprites.extend([0, 1, self.miss2, self.sink2, self.sink2])
 
     def onEnter(self, event):
         self.myInput = self.entry.get()
