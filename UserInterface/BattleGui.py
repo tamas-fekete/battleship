@@ -146,6 +146,9 @@ class BattleGui(tk.Frame):
         self.oceanSprites.extend([0, 1, self.miss2, self.sink2, self.sink2])
 
     def onEnter(self, event):
+        self.gameAI()
+
+    def gameAI(self):
         self.myInput = self.entry.get()
         self.entry.delete(0, tk.END)
         self.textBox.delete("1.0", tk.END)
