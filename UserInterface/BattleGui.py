@@ -1,7 +1,7 @@
 import tkinter as tk
 from PIL import Image, ImageTk
 from helper import helper as hl
-from gameLogic.GameLogic import GameLogic
+from gameLogic.PlayerState import PlayerState
 from AI.AI import AIClass
 
 class Cons:
@@ -56,8 +56,8 @@ class BattleGui(tk.Frame):
         self.shipSprites = []
         self.radarSprites = []
         self.oceanSprites = []
-        self.gameLogic = GameLogic(None, self)
-        self.gameLogicAI = GameLogic(None, self)
+        self.gameLogic = PlayerState(None, self)
+        self.gameLogicAI = PlayerState(None, self)
         self.AI = AIClass()
         self.gameLogicAI.readInAIShips(self.AI.initShips())
         self.responseAI = None

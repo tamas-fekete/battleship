@@ -1,11 +1,11 @@
 from AI.AI import AIClass
-from gameLogic.GameLogic import GameLogic
+from gameLogic.PlayerState import PlayerState
 
 
 class GameVsAI:
     def __init__(self, playerCommunicator):
-        self.gameLogic = GameLogic(self)
-        self.gameLogicAI = GameLogic(self)
+        self.gameLogic = PlayerState(self)
+        self.gameLogicAI = PlayerState(self)
         self.AI = AIClass()
         self.playerCommunicator = playerCommunicator
         self.initialization()

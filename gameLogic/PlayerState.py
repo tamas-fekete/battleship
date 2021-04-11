@@ -1,9 +1,9 @@
 from helper import helper as hl
 
-# GameLogic osztaly: sorfolytonos repr. allapot, jatekosok hajoinak tarolasa, szukseges hajok
+# PlayerState osztaly: sorfolytonos repr. allapot, jatekosok hajoinak tarolasa, szukseges hajok
 
 
-class GameLogic():
+class PlayerState():
     def __init__(self, gameVsAI, gui):
         self.previousShot = None
         self.state = [hl.States.WATER] * 100
@@ -120,7 +120,6 @@ class GameLogic():
         sizes = [item for sublist in sizes for item in sublist]
         guiShip = hl.guiShip()
 
-
         i = sizes[self.j]
         guiShip.size = i
 
@@ -195,7 +194,7 @@ class GameLogic():
 
         self.gameState = gameState
 
-# gl = GameLogic()
+# gl = PlayerState()
 # gl.readIn()
 # print(gl.playerOneShips)
 # gl.printState()
