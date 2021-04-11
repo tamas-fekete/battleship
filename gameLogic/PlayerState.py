@@ -80,8 +80,18 @@ class PlayerState():
                         if self.state[i] == hl.States.HIT and [elem != hl.States.SHIP for elem in hl.getNeighbours(i)]:
                             self.state[i] = hl.States.SINK
                     return hl.States.SINK
-        else:
+
+        elif self.state[coord] == hl.States.WATER:
             self.state[coord] = hl.States.MISSED
+            return hl.States.MISSED
+
+        elif self.state[coord] == hl.States.HIT:
+            return hl.States.HIT
+
+        elif self.state[coord] == hl.States.SINK:
+            return hl.States.SINK
+
+        elif self.state[coord] == hl.States.MISSED:
             return hl.States.MISSED
 
     def shoot(self, coordinate):
