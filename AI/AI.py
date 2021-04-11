@@ -1,10 +1,11 @@
 from helper import helper as hl
-from random import randrange
+from gameLogic.PlayerState import PlayerState
 import random
 
 
-class AIClass:
+class AIClass(PlayerState):
     def __init__(self):
+        super().__init__(None, False)
         self.lastShot=None
         self.myShots=[]
         self.possibleShots=list(range(0,100))
@@ -24,77 +25,6 @@ class AIClass:
     def nextStep(self,replyfromserver=hl.States.MISSED):
         self.replyFromServer=replyfromserver
         return next(self.nextStepGenerator)
-
-    def initShips(self):
-        self.myShips=[]
-        possiblePositions= [i for i in range(100)]
-        sizes = [5, 2, 1, 1]  # sizes=[5,4,4,3,3,3,2,2,1,1]
-        for i in range(len(sizes)):
-            pos_good=False
-            pos=None
-            good_dirs=[]
-            while not pos_good:
-                pos = random.randint(0, 99)
-                #print(pos)
-                for size in range(sizes[i]):
-                    if pos+size not in possiblePositions :
-                        break
-                    else:
-                        if size==sizes[i]-1:
-                            good_dirs.append(1)
-                            pos_good=True
-                for size in range(sizes[i]):
-                    if pos-size not in possiblePositions :
-                        break
-                    else:
-                        if size==sizes[i]-1:
-                            good_dirs.append(-1)
-                            pos_good=True
-                for size in range(sizes[i]):
-                    if pos+(size*10) not in possiblePositions :
-                        break
-                    else:
-                        if size==sizes[i]-1:
-                            good_dirs.append(10)
-                            pos_good=True
-                for size in range(sizes[i]):
-                    if pos-(size*10) not in possiblePositions :
-                        break
-                    else:
-                        if size==sizes[i]-1:
-                            good_dirs.append(-10)
-                            pos_good=True
-
-            if sizes[i]==111:
-                need_to_be_deleted= hl.getNeighbours(pos)
-                #print(need_to_be_deleted,pos)
-                for j in need_to_be_deleted:
-                    if j in possiblePositions:
-                        possiblePositions.remove(j)
-                #print(possiblePositions)
-                nextship=[pos]
-                self.myShips.append(nextship)
-            else:
-                nextship=[pos]
-                random.shuffle(good_dirs)
-                for h in range(1,sizes[i]):
-                    nextship.append(pos+good_dirs[0]*h)
-                for coord in nextship:
-                    need_to_be_deleted=hl.getNeighbours(coord)
-                    for d in need_to_be_deleted:
-                        if d in possiblePositions:
-                            possiblePositions.remove(d)
-                self.myShips.append(nextship)
-
-        #print(self.myShips)
-        return self.myShips
-
-
-
-
-
-
-
 
         # minden hajó egy list ebben a list-ben, a hajo altal felvett koordinatakat tartalmazza
 
