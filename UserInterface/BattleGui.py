@@ -4,6 +4,7 @@ from helper import helper as hl
 from gameLogic.PlayerState import PlayerState
 from AI.AI import AIClass
 
+
 class Cons:
     BOARD_WIDTH = 342
     BOARD_HEIGHT = 342
@@ -36,11 +37,12 @@ class Board(tk.Canvas):
 
 class BattleGui(tk.Frame):
 
-    def __init__(self):
+    def __init__(self, randomShips):
         super().__init__()
-        self.bind_all("<Return>", self.onEnter)
+        self.master.nametowidget("button3").destroy()
+        self.master.nametowidget("button4").destroy()
 
-        self.master.title("BattleShip")
+        self.bind_all("<Return>", self.onEnter)
 
         self.inputText = tk.Label(text="Attack coordinates:")
         self.inputText.pack()
@@ -56,10 +58,12 @@ class BattleGui(tk.Frame):
         self.shipSprites = []
         self.radarSprites = []
         self.oceanSprites = []
-        self.gameLogic = PlayerState(None, self)
-        self.gameLogicAI = PlayerState(None, self)
+
+        self.randomShips = randomShips
+        self.player1 = PlayerState(self, self.randomShips)
+
         self.AI = AIClass()
-        self.gameLogicAI.readInAIShips(self.AI.initShips())
+        self.AI.initShips()
         self.responseAI = None
         self.loadImages()
 
@@ -82,6 +86,16 @@ class BattleGui(tk.Frame):
         menu.add_cascade(label="File", menu=file)
 
         self.pack()
+        if self.randomShips:
+
+            self.randomShips = False            # because this if only needs to be executed once in the beginning
+            ships = self.player1.initShips()    # gets the random ship list
+            # draw ships on the ocean grid:
+            for ship in ships:
+                pixelCoords = self.coordinateToPixel(ship.startingCoordinate)
+                self.boardShips.putImageOnCanvas(self.shipSprites[ship.size-1][ship.orientation], pixelCoords[0], pixelCoords[1],
+                                                 "ship" + str(ship.size)+str(ship.orientation))
+
 
     def loadImages(self):
 
@@ -146,16 +160,16 @@ class BattleGui(tk.Frame):
         self.oceanSprites.extend([0, 1, self.miss2, self.sink2, self.sink2])
 
     def onEnter(self, event):
-        self.gameAI()
+        self.gameAgainstAI()
 
-    def gameAI(self):
+    def gameAgainstAI(self):
         self.myInput = self.entry.get()
         self.entry.delete(0, tk.END)
         self.textBox.delete("1.0", tk.END)
         self.textBox.insert(tk.END, self.myInput + "\n")
 
-        if self.gameLogic.gameState == 0:  # init state
-            ship = self.gameLogic.readIn()
+        if self.player1.gameState == 0:  # init state
+            ship = self.player1.readIn()
             if ship.successful:
                 pixelCoords = self.coordinateToPixel(ship.startingCoordinate)
 
@@ -164,18 +178,18 @@ class BattleGui(tk.Frame):
             else:
                 pass  # notify user that ship placement was unsuccessful
 
-        elif self.gameLogic.gameState == 1:   # game started against opponent
+        elif self.player1.gameState == 1:   # game started against opponent
 
             # jatekos lo az AI-ra es az AI megmondja, hogy hit, miss vagy sink:
-            response = self.gameLogicAI.responseOfMissile(self.gameLogic.shoot(self.myInput))
-            self.gameLogic.updateOpponentState(response)
-            self.updateRadar(self.gameLogic.opponentState)
+            response = self.AI.responseOfMissile(self.player1.shoot(self.myInput))
+            self.player1.updateOpponentState(response)
+            self.updateRadar(self.player1.opponentState)
             # csalas:
-            print(self.gameLogicAI.printState())
+            print(self.AI.printState())
 
             # ha az AI-nak elfogytak a hajoi, akkor nyert a jatekos
-            if len(self.gameLogicAI.playerOneShips) == 0:
-                self.gameLogic.gameState = 2
+            if len(self.AI.playerOneShips) == 0:
+                self.player1.gameState = 2
                 self.winner = "You"
                 self.textBox.delete("1.0", tk.END)
                 self.textBox.insert(tk.END, "You win, congrats!" + "\n")
@@ -185,22 +199,22 @@ class BattleGui(tk.Frame):
             # self.printStateForMe("AI shoot: ")  # TODO az indexet vissza kell alakítani koordinátává
 
             # az AI lovesere reagal a jatekos
-            self.responseAI = self.gameLogic.responseOfMissile(AInextshot)
+            self.responseAI = self.player1.responseOfMissile(AInextshot)
 
             # updatelni kell az ocean grid-et:
-            self.updateOcean(self.gameLogic.state)
+            self.updateOcean(self.player1.state)
 
-            self.gameLogicAI.setPreviousShot(AInextshot)  # lementeni az AI-nak az AI elozo loveset
-            self.gameLogicAI.updateOpponentState(self.responseAI)  # az AI radarjat updatelni
+            self.AI.setPreviousShot(AInextshot)  # lementeni az AI-nak az AI elozo loveset
+            self.AI.updateOpponentState(self.responseAI)  # az AI radarjat updatelni
 
             # ha elfogytak a jatekos hajoi, akkor az AI nyert
-            if len(self.gameLogic.playerOneShips) == 0:
-                self.gameLogic.gameState = 2
+            if len(self.player1.playerOneShips) == 0:
+                self.player1.gameState = 2
                 self.winner = "AI"
                 self.textBox.delete("1.0", tk.END)
                 self.textBox.insert(tk.END, "The AI owned you, you lose!" + "\n")
 
-        elif self.gameLogic.gameState == 2:
+        elif self.player1.gameState == 2:
             self.textBox.delete("1.0", tk.END)
             if self.winner == "AI":
                 self.textBox.insert(tk.END, "The AI owned you, you lose!" + "\n")
@@ -246,10 +260,41 @@ class BattleGui(tk.Frame):
 
 
 def main():
+    def singlePlayer():
+        root.nametowidget("button1").destroy()
+        root.nametowidget("button2").destroy()
+        button3 = tk.Button(root, text="I want random ships", name="button3", command=rndShips)
+        button4 = tk.Button(root, text="I want to place my own ships", name="button4", command=ownShips)
+
+        button3.pack()
+        button4.pack()
+
     root = tk.Tk()
     root.iconbitmap("sprites/sonar.ico")
-    BattleGui()
+    root.geometry("1000x500")
+    root.title("BattleShip")
+
+    button1 = tk.Button(root, text="Multi-Player", name="button1", command=doNothing)
+    button2 = tk.Button(root, text="Single-Player",  name="button2", command=singlePlayer)
+
+    button1.pack()
+    button2.pack()
+
     root.mainloop()
+
+
+def doNothing():
+    pass
+
+
+def rndShips():
+    randomShips = True
+    BattleGui(randomShips)
+
+
+def ownShips():
+    randomShips = False
+    BattleGui(randomShips)
 
 
 if __name__ == '__main__':
