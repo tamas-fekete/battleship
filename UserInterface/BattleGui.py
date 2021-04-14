@@ -14,8 +14,8 @@ class Cons:
 
 class Board(tk.Canvas):
 
-    def __init__(self, imageBackground):
-        super().__init__(width=Cons.BOARD_WIDTH, height=Cons.BOARD_HEIGHT,
+    def __init__(self, parent, imageBackground):
+        super().__init__(master=parent, width=Cons.BOARD_WIDTH, height=Cons.BOARD_HEIGHT,
                          background="black", highlightthickness=0)
 
         self.initBoard(imageBackground)
@@ -37,21 +37,15 @@ class Board(tk.Canvas):
 
 class BattleGui(tk.Frame):
 
-    def __init__(self, randomShips):
-        super().__init__()
-        self.master.nametowidget("button3").destroy()
-        self.master.nametowidget("button4").destroy()
+    def __init__(self, parent, controller, randomShips, width, height):
+        tk.Frame.__init__(self, master=parent, width=width, height=height)
+        self.boardShips = Board(parent=self, imageBackground=Image.open("sprites/oceangrid_final.png"))
+        self.radarShips = Board(parent=self, imageBackground=Image.open("sprites/radargrid_final.png"))
 
-        self.bind_all("<Return>", self.onEnter)
-
-        self.inputText = tk.Label(text="Attack coordinates:")
-        self.inputText.pack()
-
-        self.entry = tk.Entry()
-        self.entry.pack()
-
-        self.boardShips = Board(Image.open("sprites/oceangrid_final.png"))
-        self.radarShips = Board(Image.open("sprites/radargrid_final.png"))
+        self.inputText = None
+        self.entry = None
+        self.gameInfo = None
+        self.textBox = None
 
         self.winner = None
         self.myInput = None     # az elejen ebben a valtozoban lesz elmentve a letenni kivant hajo, aztan pedig a loves koordinataja
@@ -60,6 +54,7 @@ class BattleGui(tk.Frame):
         self.oceanSprites = []
 
         self.randomShips = randomShips
+        self.guiReady = True
         self.player1 = PlayerState(self, self.randomShips)
 
         self.AI = AIClass()
@@ -70,32 +65,48 @@ class BattleGui(tk.Frame):
         self.boardShips.pack(side=tk.LEFT, expand="true")
         self.radarShips.pack(side=tk.RIGHT, expand="true")
 
-        self.gameInfo = tk.Label(text="Game Information:")
-        self.gameInfo.pack()
-        self.textBox = tk.Text(width=40, height=1)
-        self.textBox.pack()
-
-        # creating menus:
-        menu = tk.Menu(self.master)
-        self.master.config(menu=menu)
-
-        file = tk.Menu(menu)
-        file.add_command(label="play on network")
-        file.add_command(label="play against AI")
-        file.add_command(label="Exit", command=self.clientExit)
-        menu.add_cascade(label="File", menu=file)
-
-        self.pack()
+        # self.pack()
         if self.randomShips:
 
+            self.guiReady = False               # dont want the game to start immediately
             self.randomShips = False            # because this if only needs to be executed once in the beginning
-            ships = self.player1.initShips()    # gets the random ship list
-            # draw ships on the ocean grid:
-            for ship in ships:
-                pixelCoords = self.coordinateToPixel(ship.startingCoordinate)
-                self.boardShips.putImageOnCanvas(self.shipSprites[ship.size-1][ship.orientation], pixelCoords[0], pixelCoords[1],
-                                                 "ship" + str(ship.size)+str(ship.orientation))
+            self.generateRandomShips()
 
+            button1 = tk.Button(self, text="New Random Ships", name="rndShipsBtn",
+                                command=self.generateRandomShips)
+            button2 = tk.Button(self, text="Start the Game", name="startGameBtn",
+                                command=self.setGuiReady)
+
+            button1.pack()
+            button2.pack()
+        else:
+            self.setGuiReady(destroyWidgets=False)
+
+    def generateRandomShips(self):
+        ships = self.player1.initShips()  # gets the random ship list
+        # draw ships on the ocean grid:
+        self.boardShips.delete("ships")
+        for ship in ships:
+            pixelCoords = self.coordinateToPixel(ship.startingCoordinate)
+            self.boardShips.putImageOnCanvas(self.shipSprites[ship.size - 1][ship.orientation], pixelCoords[0],
+                                             pixelCoords[1], "ships")
+
+    def setGuiReady(self, destroyWidgets=True):
+        self.guiReady = True
+
+        if destroyWidgets:
+            self.nametowidget("rndShipsBtn").destroy()
+            self.nametowidget("startGameBtn").destroy()
+
+        self.inputText = tk.Label(master=self, text="Attack coordinates:")
+        self.inputText.pack()
+        self.entry = tk.Entry(master=self)
+        self.entry.pack()
+        self.gameInfo = tk.Label(master=self, text="Game Information:")
+        self.gameInfo.pack()
+        self.textBox = tk.Text(master=self, width=40, height=1)
+        self.textBox.pack()
+        self.bind_all("<Return>", self.onEnter)
 
     def loadImages(self):
 
@@ -163,63 +174,64 @@ class BattleGui(tk.Frame):
         self.gameAgainstAI()
 
     def gameAgainstAI(self):
-        self.myInput = self.entry.get()
-        self.entry.delete(0, tk.END)
-        self.textBox.delete("1.0", tk.END)
-        self.textBox.insert(tk.END, self.myInput + "\n")
-
-        if self.player1.gameState == 0:  # init state
-            ship = self.player1.readIn()
-            if ship.successful:
-                pixelCoords = self.coordinateToPixel(ship.startingCoordinate)
-
-                self.boardShips.putImageOnCanvas(self.shipSprites[ship.size-1][ship.orientation], pixelCoords[0], pixelCoords[1],
-                                                 "ship"+str(ship.size)+str(ship.orientation))
-            else:
-                pass  # notify user that ship placement was unsuccessful
-
-        elif self.player1.gameState == 1:   # game started against opponent
-
-            # jatekos lo az AI-ra es az AI megmondja, hogy hit, miss vagy sink:
-            response = self.AI.responseOfMissile(self.player1.shoot(self.myInput))
-            self.player1.updateOpponentState(response)
-            self.updateRadar(self.player1.opponentState)
-            # csalas:
-            print(self.AI.printState())
-
-            # ha az AI-nak elfogytak a hajoi, akkor nyert a jatekos
-            if len(self.AI.playerOneShips) == 0:
-                self.player1.gameState = 2
-                self.winner = "You"
-                self.textBox.delete("1.0", tk.END)
-                self.textBox.insert(tk.END, "You win, congrats!" + "\n")
-
-            # a deepmind klon kiszamolja a kovetkezo lepeset
-            AInextshot = self.AI.nextStep(self.responseAI)
-            # self.printStateForMe("AI shoot: ")  # TODO az indexet vissza kell alakítani koordinátává
-
-            # az AI lovesere reagal a jatekos
-            self.responseAI = self.player1.responseOfMissile(AInextshot)
-
-            # updatelni kell az ocean grid-et:
-            self.updateOcean(self.player1.state)
-
-            self.AI.setPreviousShot(AInextshot)  # lementeni az AI-nak az AI elozo loveset
-            self.AI.updateOpponentState(self.responseAI)  # az AI radarjat updatelni
-
-            # ha elfogytak a jatekos hajoi, akkor az AI nyert
-            if len(self.player1.playerOneShips) == 0:
-                self.player1.gameState = 2
-                self.winner = "AI"
-                self.textBox.delete("1.0", tk.END)
-                self.textBox.insert(tk.END, "The AI owned you, you lose!" + "\n")
-
-        elif self.player1.gameState == 2:
+        if self.guiReady:
+            self.myInput = self.entry.get()
+            self.entry.delete(0, tk.END)
             self.textBox.delete("1.0", tk.END)
-            if self.winner == "AI":
-                self.textBox.insert(tk.END, "The AI owned you, you lose!" + "\n")
-            elif self.winner == "You":
-                self.textBox.insert(tk.END, "You win, congrats!" + "\n")
+            self.textBox.insert(tk.END, self.myInput + "\n")
+
+            if self.player1.gameState == 0:  # init state
+                ship = self.player1.readIn()
+                if ship.successful:
+                    pixelCoords = self.coordinateToPixel(ship.startingCoordinate)
+
+                    self.boardShips.putImageOnCanvas(self.shipSprites[ship.size-1][ship.orientation], pixelCoords[0], pixelCoords[1],
+                                                     "ship"+str(ship.size)+str(ship.orientation))
+                else:
+                    pass  # notify user that ship placement was unsuccessful
+
+            elif self.player1.gameState == 1:   # game started against opponent
+
+                # jatekos lo az AI-ra es az AI megmondja, hogy hit, miss vagy sink:
+                response = self.AI.responseOfMissile(self.player1.shoot(self.myInput))
+                self.player1.updateOpponentState(response)
+                self.updateRadar(self.player1.opponentState)
+                # csalas:
+                print(self.AI.printState())
+
+                # ha az AI-nak elfogytak a hajoi, akkor nyert a jatekos
+                if len(self.AI.playerOneShips) == 0:
+                    self.player1.gameState = 2
+                    self.winner = "You"
+                    self.textBox.delete("1.0", tk.END)
+                    self.textBox.insert(tk.END, "You win, congrats!" + "\n")
+
+                # a deepmind klon kiszamolja a kovetkezo lepeset
+                AInextshot = self.AI.nextStep(self.responseAI)
+                # self.printStateForMe("AI shoot: ")  # TODO az indexet vissza kell alakítani koordinátává
+
+                # az AI lovesere reagal a jatekos
+                self.responseAI = self.player1.responseOfMissile(AInextshot)
+
+                # updatelni kell az ocean grid-et:
+                self.updateOcean(self.player1.state)
+
+                self.AI.setPreviousShot(AInextshot)  # lementeni az AI-nak az AI elozo loveset
+                self.AI.updateOpponentState(self.responseAI)  # az AI radarjat updatelni
+
+                # ha elfogytak a jatekos hajoi, akkor az AI nyert
+                if len(self.player1.playerOneShips) == 0:
+                    self.player1.gameState = 2
+                    self.winner = "AI"
+                    self.textBox.delete("1.0", tk.END)
+                    self.textBox.insert(tk.END, "The AI owned you, you lose!" + "\n")
+
+            elif self.player1.gameState == 2:
+                self.textBox.delete("1.0", tk.END)
+                if self.winner == "AI":
+                    self.textBox.insert(tk.END, "The AI owned you, you lose!" + "\n")
+                elif self.winner == "You":
+                    self.textBox.insert(tk.END, "You win, congrats!" + "\n")
 
     def getInput(self):
         return self.myInput
@@ -259,28 +271,92 @@ class BattleGui(tk.Frame):
         exit()
 
 
-def main():
-    def singlePlayer():
-        root.nametowidget("button1").destroy()
-        root.nametowidget("button2").destroy()
-        button3 = tk.Button(root, text="I want random ships", name="button3", command=rndShips)
-        button4 = tk.Button(root, text="I want to place my own ships", name="button4", command=ownShips)
+class RandomShips(BattleGui):
+    def __init__(self, parent, controller, width, height):
+        BattleGui.__init__(self, parent=parent, controller=controller, randomShips=True, width=width, height=height)
+
+
+class PlaceShips(BattleGui):
+    def __init__(self, parent, controller, width, height):
+        BattleGui.__init__(self, parent=parent, controller=controller, randomShips=False, width=width, height=height)
+
+
+class StartPage(tk.Frame):
+    def __init__(self, parent, controller, width, height):
+        tk.Frame.__init__(self, master=parent, width=width, height=height)
+        self.controller = controller
+
+        button1 = tk.Button(self, text="Multi-Player", name="button1",
+                            command=lambda: controller.showFrame("MultiPlayerPage"))
+        button2 = tk.Button(self, text="Single-Player", name="button2",
+                            command=lambda: controller.showFrame("SinglePlayerPage"))
+
+        button1.pack()
+        button2.pack()
+
+
+class SinglePlayerPage(tk.Frame):
+    def __init__(self, parent, controller, width, height):
+        tk.Frame.__init__(self, master=parent, width=width, height=height)
+        self.controller = controller
+
+        button3 = tk.Button(self, text="I want random ships", name="button3",
+                            command=lambda: controller.showFrame("RandomShips"))
+        button4 = tk.Button(self, text="I want to place my own ships",
+                            name="button4", command=lambda: controller.showFrame("PlaceShips"))
 
         button3.pack()
         button4.pack()
 
-    root = tk.Tk()
-    root.iconbitmap("sprites/sonar.ico")
-    root.geometry("1000x500")
-    root.title("BattleShip")
 
-    button1 = tk.Button(root, text="Multi-Player", name="button1", command=doNothing)
-    button2 = tk.Button(root, text="Single-Player",  name="button2", command=singlePlayer)
+class MultiPlayerPage(tk.Frame):
+    def __init__(self, parent, controller, height, width):
+        tk.Frame.__init__(self, master=parent, height=height, width=width)
+        self.controller = controller
 
-    button1.pack()
-    button2.pack()
+        label = tk.Label(self, text="Multiplayer page is not ready yet")
+        label.pack()
+        button1 = tk.Button(self, text="StartPage", name="button1",
+                            command=lambda: controller.showFrame("StartPage"))
 
-    root.mainloop()
+        button1.pack()
+
+
+class MainGuiApp(tk.Tk):
+    def __init__(self):
+        tk.Tk.__init__(self)
+        self.iconbitmap("sprites/sonar.ico")
+        self.geometry("1000x500")
+        self.title("BattleShip")
+        ibackground = Image.open("sprites/background.jpg")
+        background = ImageTk.PhotoImage(ibackground)
+        bgLabel = tk.Label(self, image=background)
+        bgLabel.place(x=0, y=0, relwidth=1, relheight=1)
+
+        container = tk.Frame(self, width=1000, height=500)
+        container.pack(side="top", fill="both", expand=True)
+        container.grid_rowconfigure(0, weight=1)
+        container.grid_columnconfigure(0, weight=1)
+
+        self.frames = {}
+
+        for FRAME in (StartPage, SinglePlayerPage, MultiPlayerPage, RandomShips, PlaceShips):
+            pageName = FRAME.__name__
+            frame = FRAME(parent=container, controller=self, width=1000, height=500)
+            self.frames[pageName] = frame
+            frame.grid(row=0, column=0, sticky="nsew")
+
+        self.showFrame("StartPage")
+
+    def showFrame(self, pageName):
+        frame = self.frames[pageName]
+        frame.tkraise()
+
+
+def main():
+
+    gui = MainGuiApp()
+    gui.mainloop()
 
 
 def doNothing():
