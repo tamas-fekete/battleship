@@ -8,7 +8,7 @@ class PlayerState():
         self.previousShot = None
         self.state = [hl.States.WATER] * 100
         self.opponentState = [hl.States.WATER] * 100
-        self.ships = [[2, 1], [1, 5]] # self.ships = [[2, 1], [2, 2], [3, 3], [2, 4], [1, 5]]
+        self.ships = [[2, 1], [2, 2], [3, 3], [2, 4], [1, 5]] #self.ships = [[2, 1], [1, 5]] #
         self.playerOneShips = []
         self.forbiddenSpaces = set([])
         if randomShips:
@@ -202,7 +202,7 @@ class PlayerState():
 
         myShips=[]
         possiblePositions= [i for i in range(100)]
-        sizes = [5, 2, 1, 1]  # sizes=[5,4,4,3,3,3,2,2,1,1]
+        sizes=[5,4,4,3,3,3,2,2,1,1] # sizes = [5, 2, 1, 1]  #
         for i in range(len(sizes)):
             pos_good=False
             pos=None
@@ -211,7 +211,10 @@ class PlayerState():
                 pos = random.randint(0, 99)
                 #print(pos)
                 for size in range(sizes[i]):
+                    print(int(pos/10),int((pos+size)/10))
                     if pos+size not in possiblePositions :
+                        break
+                    elif int(pos/10) != int((pos+size)/10):
                         break
                     else:
                         if size==sizes[i]-1:
@@ -219,6 +222,8 @@ class PlayerState():
                             pos_good=True
                 for size in range(sizes[i]):
                     if pos-size not in possiblePositions :
+                        break
+                    elif int(pos/10) != int((pos-size)/10):
                         break
                     else:
                         if size==sizes[i]-1:
@@ -239,7 +244,7 @@ class PlayerState():
                             good_dirs.append(-10)
                             pos_good=True
 
-            if sizes[i]==111:
+            if sizes[i]==1:
                 need_to_be_deleted= hl.getNeighbours(pos)
                 #print(need_to_be_deleted,pos)
                 for j in need_to_be_deleted:
