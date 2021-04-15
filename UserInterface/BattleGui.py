@@ -354,23 +354,8 @@ class MainGuiApp(tk.Tk):
 
 
 def main():
-
     gui = MainGuiApp()
     gui.mainloop()
-
-
-def doNothing():
-    pass
-
-
-def rndShips():
-    randomShips = True
-    BattleGui(randomShips)
-
-
-def ownShips():
-    randomShips = False
-    BattleGui(randomShips)
 
 
 if __name__ == '__main__':
