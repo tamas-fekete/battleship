@@ -202,7 +202,7 @@ class PlayerState():
 
         myShips=[]
         possiblePositions= [i for i in range(100)]
-        sizes=[5,4,4,3,3,3,2,2,1,1] # sizes = [5, 2, 1, 1]  #
+        sizes = [5, 4, 4, 3, 3, 3, 2, 2, 1, 1] # sizes = [5, 2, 1, 1]  # sizes=[5,4,4,3,3,3,2,2,1,1]
         for i in range(len(sizes)):
             pos_good=False
             pos=None
