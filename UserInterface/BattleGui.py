@@ -3,7 +3,8 @@ from PIL import Image, ImageTk
 from helper import helper as hl
 from gameLogic.PlayerState import PlayerState
 from AI.AI import AIClass
-
+import pickle
+import socket
 
 class Cons:
     BOARD_WIDTH = 342
@@ -271,6 +272,73 @@ class BattleGui(tk.Frame):
         exit()
 
 
+class BattleGuiOnline(BattleGui):
+    def __init__(self, parent, controller, width, height):
+        tk.Frame.__init__(self, master=parent, width=width, height=height)
+        self.boardShips = Board(parent=self, imageBackground=Image.open("sprites/oceangrid_final.png"))
+        self.radarShips = Board(parent=self, imageBackground=Image.open("sprites/radargrid_final.png"))
+
+        self.clientsocket = None
+
+        self.inputText = None
+        self.entry = None
+        self.gameInfo = None
+        self.textBox = None
+
+        self.winner = None
+        self.myInput = None  # az elejen ebben a valtozoban lesz elmentve a letenni kivant hajo, aztan pedig a loves koordinataja
+        self.shipSprites = []
+        self.radarSprites = []
+        self.oceanSprites = []
+
+        self.loadImages()
+
+        self.boardShips.pack(side=tk.LEFT, expand="true")
+        self.radarShips.pack(side=tk.RIGHT, expand="true")
+
+        button1 = tk.Button(self, text="Join Game", name="joingame", command=self.joinGame)
+        button2 = tk.Button(self, text="Start Page", name="startpage", command=lambda: controller.showFrame("StartPage"))
+
+        button1.pack()
+        button2.pack()
+
+    def joinGame(self):
+
+        self.nametowidget("joingame").destroy()
+        self.nametowidget("startpage").destroy()
+
+        self.inputText = tk.Label(master=self, text="Attack coordinates:")
+        self.inputText.pack()
+        self.entry = tk.Entry(master=self)
+        self.entry.pack()
+        self.gameInfo = tk.Label(master=self, text="Game Information:")
+        self.gameInfo.pack()
+        self.textBox = tk.Text(master=self, width=40, height=1)
+        self.textBox.pack()
+
+        self.clientsocket = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
+        self.clientsocket.connect(('127.0.0.1', 5001))
+
+        guiShips = self.receiveData()
+        self.drawShips(guiShips)
+
+        self.bind_all("<Return>", self.onEnter)
+
+    def onEnter(self, event):
+        pass
+
+    def receiveData(self):
+        data = self.clientsocket.recv(1024)
+        data = pickle.loads(data)
+        return data
+
+    def drawShips(self, ships):
+        self.boardShips.delete("ships")
+        for ship in ships:
+            pixelCoords = self.coordinateToPixel(ship.startingCoordinate)
+            self.boardShips.putImageOnCanvas(self.shipSprites[ship.size - 1][ship.orientation], pixelCoords[0],
+                                             pixelCoords[1], "ships")
+
 class RandomShips(BattleGui):
     def __init__(self, parent, controller, width, height):
         BattleGui.__init__(self, parent=parent, controller=controller, randomShips=True, width=width, height=height)
@@ -309,17 +377,9 @@ class SinglePlayerPage(tk.Frame):
         button4.pack()
 
 
-class MultiPlayerPage(tk.Frame):
+class MultiPlayerPage(BattleGuiOnline):
     def __init__(self, parent, controller, height, width):
-        tk.Frame.__init__(self, master=parent, height=height, width=width)
-        self.controller = controller
-
-        label = tk.Label(self, text="Multiplayer page is not ready yet")
-        label.pack()
-        button1 = tk.Button(self, text="StartPage", name="button1",
-                            command=lambda: controller.showFrame("StartPage"))
-
-        button1.pack()
+        BattleGuiOnline.__init__(self, parent=parent, controller=controller, width=width, height=height)
 
 
 class MainGuiApp(tk.Tk):
