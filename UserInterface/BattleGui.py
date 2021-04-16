@@ -77,9 +77,12 @@ class BattleGui(tk.Frame):
                                 command=self.generateRandomShips)
             button2 = tk.Button(self, text="Start the Game", name="startGameBtn",
                                 command=self.setGuiReady)
+            button3 = tk.Button(self, text="Start Page", name="startpage",
+                                command=lambda: controller.showFrame("StartPage"))
 
             button1.pack()
             button2.pack()
+            button3.pack()
         else:
             self.setGuiReady(destroyWidgets=False)
 
@@ -339,6 +342,7 @@ class BattleGuiOnline(BattleGui):
             self.boardShips.putImageOnCanvas(self.shipSprites[ship.size - 1][ship.orientation], pixelCoords[0],
                                              pixelCoords[1], "ships")
 
+
 class RandomShips(BattleGui):
     def __init__(self, parent, controller, width, height):
         BattleGui.__init__(self, parent=parent, controller=controller, randomShips=True, width=width, height=height)
@@ -372,9 +376,12 @@ class SinglePlayerPage(tk.Frame):
                             command=lambda: controller.showFrame("RandomShips"))
         button4 = tk.Button(self, text="I want to place my own ships",
                             name="button4", command=lambda: controller.showFrame("PlaceShips"))
+        button5 = tk.Button(self, text="Start Page", name="startpage",
+                            command=lambda: controller.showFrame("StartPage"))
 
         button3.pack()
         button4.pack()
+        button5.pack()
 
 
 class MultiPlayerPage(BattleGuiOnline):
