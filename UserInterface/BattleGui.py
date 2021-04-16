@@ -101,6 +101,7 @@ class BattleGui(tk.Frame):
         if destroyWidgets:
             self.nametowidget("rndShipsBtn").destroy()
             self.nametowidget("startGameBtn").destroy()
+            self.nametowidget("startpage").destroy()
 
         self.inputText = tk.Label(master=self, text="Attack coordinates:")
         self.inputText.pack()
