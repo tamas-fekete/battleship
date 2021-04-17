@@ -288,6 +288,7 @@ class BattleGuiOnline(BattleGui):
         self.entry = None
         self.gameInfo = None
         self.textBox = None
+        self.playerState = None
 
         self.winner = None
         self.myInput = None  # az elejen ebben a valtozoban lesz elmentve a letenni kivant hajo, aztan pedig a loves koordinataja
@@ -320,16 +321,79 @@ class BattleGuiOnline(BattleGui):
         self.textBox = tk.Text(master=self, width=40, height=1)
         self.textBox.pack()
 
+        # connect to server:
         self.clientsocket = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
         self.clientsocket.connect(('127.0.0.1', 5001))
 
         guiShips = self.receiveData()
         self.drawShips(guiShips)
 
+        # receive player state from server:
+        self.playerState = self.receiveData()
+
         self.bind_all("<Return>", self.onEnter)
 
     def onEnter(self, event):
-        pass
+
+        if self.playerState == "Attacker": # "Attacker" "Defender" playerState, lehet ezek nem a legjobb elnevezesek
+            self.myInput = self.getAttackCoordinates()
+            self.deleteEntryUpdateTextBox()
+
+            print("sending attack coordinates")
+            self.sendData(self.myInput)
+
+            print("waiting for opponent state")
+            opponentState = self.receiveData()
+            print("received opponent state")
+
+            self.updateRadar(opponentState)
+
+            print("waiting for state")
+            grid = self.receiveData()
+            print("received state")
+            self.updateOcean(grid)
+            # self.playerState = "Defender"
+
+        elif self.playerState == "Defender":
+            print("waiting for state beginning")
+            grid = self.receiveData()
+            print("received state beginning")
+            self.updateOcean(grid)
+
+            self.myInput = self.getAttackCoordinates()
+            self.deleteEntryUpdateTextBox()
+
+            print("sending attack coordinates")
+            self.sendData(self.myInput)
+
+            print("waiting for opponent state")
+            opponentState = self.receiveData()
+            print("received opponent state")
+
+            self.updateRadar(opponentState)
+
+            print("waiting for state end")
+            grid = self.receiveData()
+            print("received state end")
+            self.updateOcean(grid)
+
+            # self.playerState = "Defender"
+            self.playerState = "Attacker"
+
+        else:
+            pass
+
+    def getAttackCoordinates(self):
+        return self.entry.get()
+
+    def deleteEntryUpdateTextBox(self):
+        self.entry.delete(0, tk.END)
+        self.textBox.delete("1.0", tk.END)
+        self.textBox.insert(tk.END, self.myInput + "\n")
+
+    def sendData(self, message):
+        message = pickle.dumps(message)
+        self.clientsocket.send(message)
 
     def receiveData(self):
         data = self.clientsocket.recv(1024)

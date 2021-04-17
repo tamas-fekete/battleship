@@ -19,50 +19,69 @@ class Server():
         self.serversocket.listen()
         # list of connections
         self.connection = []
+        self.waitingForConnections()
 
         self.player1 = PlayerState(gui=None, randomShips=False)
         self.player2 = PlayerState(gui=None, randomShips=False)
 
-        self.waiting_for_connections()
 
-    def initPlayerShips(self):
 
-        player1GuiShips = self.player1.initShips()
-        player2GuiShips = self.player2.initShips()
+    def waitingForConnections(self):
 
-        data1 = pickle.dumps(player1GuiShips)
-        self.connection[0].send(data1)
-
-        data2 = pickle.dumps(player2GuiShips)
-        self.connection[1].send(data2)
-
-        # allow players to ask for new random ships
-
-    def waiting_for_connections(self):
-
-        while len(self.connection) < 1:  # while len(self.connection) < 2:
+        while len(self.connection) < 2:
             conn, addr = self.serversocket.accept()
             self.connection.append(conn)
-            print(conn)
-            print(self.connection)
+            print("player" + str(len(self.connection)) + "joined")
+            # print(conn)
+            # print(self.connection)
 
-    def recieve_information(self):
-        player_1_info = pickle.loads(self.connection[0].recv(1024))
-        player_2_info = pickle.loads(self.connection[1].recv(1024))
+    def receiveFromPlayer1(self):
+        return pickle.loads(self.connection[0].recv(1024))
 
-        return player_1_info, player_2_info
+    def receiveFromPlayer2(self):
+        return pickle.loads(self.connection[1].recv(1024))
+
+    def sendToPlayer1(self, data):
+        data = pickle.dumps(data)
+        self.connection[0].send(data)
+
+    def sendToPlayer2(self, data):
+        data = pickle.dumps(data)
+        self.connection[1].send(data)
 
     def startServer(self):
         # main server loop
+        guiShips1 = self.player1.initShips()
+        self.sendToPlayer1(guiShips1)
+        self.sendToPlayer1("Attacker")  # player 1 attacks first
 
-        self.initPlayerShips()
+        guiShips2 = self.player2.initShips()
+        self.sendToPlayer2(guiShips2)
+        self.sendToPlayer2("Defender")
 
         while True:
-            # player1, player2 = recieve_information()
+            print("waiting for player 1 attack coordinates")
+            attackCoordinate = self.receiveFromPlayer1()
+            print("received attack coordinates from player 1")
+            response = self.player2.responseOfMissile(self.player1.shoot(attackCoordinate))
+            self.player1.updateOpponentState(response)
 
-            guiShips = self.player1.initShips()
-            guiShips = pickle.dumps(guiShips)
-            self.connection[0].send(guiShips)
+            print("sending opponent state to player 1")
+            self.sendToPlayer1(self.player1.opponentState)
+            print("sending state to player 2")
+            self.sendToPlayer2(self.player2.state)
+
+            print("waiting for player 2 attack coordinates")
+            attackCoordinate = self.receiveFromPlayer2()
+            print("received attack coordinates from player 2")
+            response = self.player1.responseOfMissile(self.player2.shoot(attackCoordinate))
+            self.player2.updateOpponentState(response)
+
+            print("sending opponent state to player 2")
+            self.sendToPlayer2(self.player2.opponentState)
+            print("sending state to player 1")
+            self.sendToPlayer1(self.player1.state)
+
 
             ''' Szerver ötlet: 
             
@@ -81,33 +100,6 @@ class Server():
             a result az a "radar" vagy az "ocean" grid
             
             '''
-
-
-
-
-
-
-            # player_1_info = pickle.loads(self.connection[0].recv(1024))
-            # print(player_1_info)
-            #
-            # message = "okay I got your message"
-            # data_arr = pickle.dumps(message)
-            # self.connection[0].send(data_arr)
-            #
-            # message = "client1 has sent me a message"
-            # data_arr = pickle.dumps(message)
-            # self.connection[1].send(data_arr)
-            #
-            # player_2_info = pickle.loads(self.connection[1].recv(1024))
-            # print(player_2_info)
-            #
-            # message = "okay I got your message"
-            # data_arr = pickle.dumps(message)
-            # self.connection[1].send(data_arr)
-            #
-            # message = "client2 has sent me a message"
-            # data_arr = pickle.dumps(message)
-            # self.connection[0].send(data_arr)
 
 
 if __name__ == '__main__':
