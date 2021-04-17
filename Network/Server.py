@@ -24,8 +24,6 @@ class Server():
         self.player1 = PlayerState(gui=None, randomShips=False)
         self.player2 = PlayerState(gui=None, randomShips=False)
 
-
-
     def waitingForConnections(self):
 
         while len(self.connection) < 2:
