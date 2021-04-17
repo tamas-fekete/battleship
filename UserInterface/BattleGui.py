@@ -325,7 +325,7 @@ class BattleGuiOnline(BattleGui):
 
         # connect to server:
         self.clientsocket = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
-        self.clientsocket.connect(('127.0.0.1', 5001))
+        self.clientsocket.connect(('192.168.0.24', 5001))
 
         guiShips = self.receiveData()
         self.drawShips(guiShips)
@@ -349,7 +349,6 @@ class BattleGuiOnline(BattleGui):
 
         print("sending attack coordinates")
         self.sendData(self.myInput)
-
 
     def receiveDataFromServerThread(self, playerState):
         ps = playerState
@@ -454,7 +453,7 @@ class MultiPlayerPage(BattleGuiOnline):
 class MainGuiApp(tk.Tk):
     def __init__(self):
         tk.Tk.__init__(self)
-        self.iconbitmap("UserInterface/sprites/sonar.ico")
+        # self.iconbitmap("UserInterface/sprites/sonar.ico")
         self.geometry("1000x500")
         self.title("BattleShip")
         ibackground = Image.open("UserInterface/sprites/background.jpg")

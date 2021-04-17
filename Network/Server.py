@@ -14,7 +14,7 @@ class Server():
         ip_address = socket.gethostbyname(self.hostname)
         # bind socket to port and ip address
         print(ip_address)
-        self.serversocket.bind(('127.0.0.1', 5001))
+        self.serversocket.bind((ip_address, 5001))
         # listen for connections
         self.serversocket.listen()
         # list of connections

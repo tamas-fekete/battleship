@@ -1,0 +1,141 @@
+{
+ "version": "auto-py-to-exe-configuration_v1",
+ "pyinstallerOptions": [
+  {
+   "optionDest": "noconfirm",
+   "value": true
+  },
+  {
+   "optionDest": "filenames",
+   "value": "C:/Users/tomi/Documents/battlegui2/battleship/main.py"
+  },
+  {
+   "optionDest": "onefile",
+   "value": false
+  },
+  {
+   "optionDest": "console",
+   "value": true
+  },
+  {
+   "optionDest": "ascii",
+   "value": false
+  },
+  {
+   "optionDest": "clean_build",
+   "value": false
+  },
+  {
+   "optionDest": "strip",
+   "value": false
+  },
+  {
+   "optionDest": "noupx",
+   "value": false
+  },
+  {
+   "optionDest": "uac_admin",
+   "value": false
+  },
+  {
+   "optionDest": "uac_uiaccess",
+   "value": false
+  },
+  {
+   "optionDest": "win_private_assemblies",
+   "value": false
+  },
+  {
+   "optionDest": "win_no_prefer_redirects",
+   "value": false
+  },
+  {
+   "optionDest": "bootloader_ignore_signals",
+   "value": false
+  },
+  {
+   "optionDest": "pathex",
+   "value": "C:/Users/tomi/Documents/battlegui2/battleship "
+  },
+  {
+   "optionDest": "datas",
+   "value": "C:/Users/tomi/Documents/battlegui2/battleship/UserInterface/sprites/1horizontal.png;UserInterface/sprites/"
+  },
+  {
+   "optionDest": "datas",
+   "value": "C:/Users/tomi/Documents/battlegui2/battleship/UserInterface/sprites/1vertical.png;UserInterface/sprites/"
+  },
+  {
+   "optionDest": "datas",
+   "value": "C:/Users/tomi/Documents/battlegui2/battleship/UserInterface/sprites/2horizontal.png;UserInterface/sprites/"
+  },
+  {
+   "optionDest": "datas",
+   "value": "C:/Users/tomi/Documents/battlegui2/battleship/UserInterface/sprites/2vertical.png;UserInterface/sprites/"
+  },
+  {
+   "optionDest": "datas",
+   "value": "C:/Users/tomi/Documents/battlegui2/battleship/UserInterface/sprites/3horizontal.png;UserInterface/sprites/"
+  },
+  {
+   "optionDest": "datas",
+   "value": "C:/Users/tomi/Documents/battlegui2/battleship/UserInterface/sprites/3vertical.png;UserInterface/sprites/"
+  },
+  {
+   "optionDest": "datas",
+   "value": "C:/Users/tomi/Documents/battlegui2/battleship/UserInterface/sprites/4horizontal.png;UserInterface/sprites/"
+  },
+  {
+   "optionDest": "datas",
+   "value": "C:/Users/tomi/Documents/battlegui2/battleship/UserInterface/sprites/4vertical.png;UserInterface/sprites/"
+  },
+  {
+   "optionDest": "datas",
+   "value": "C:/Users/tomi/Documents/battlegui2/battleship/UserInterface/sprites/5horizontal.png;UserInterface/sprites/"
+  },
+  {
+   "optionDest": "datas",
+   "value": "C:/Users/tomi/Documents/battlegui2/battleship/UserInterface/sprites/5vertical.png;UserInterface/sprites/"
+  },
+  {
+   "optionDest": "datas",
+   "value": "C:/Users/tomi/Documents/battlegui2/battleship/UserInterface/sprites/background.jpg;UserInterface/sprites/"
+  },
+  {
+   "optionDest": "datas",
+   "value": "C:/Users/tomi/Documents/battlegui2/battleship/UserInterface/sprites/hit.png;UserInterface/sprites/"
+  },
+  {
+   "optionDest": "datas",
+   "value": "C:/Users/tomi/Documents/battlegui2/battleship/UserInterface/sprites/miss.png;UserInterface/sprites/"
+  },
+  {
+   "optionDest": "datas",
+   "value": "C:/Users/tomi/Documents/battlegui2/battleship/UserInterface/sprites/miss2.png;UserInterface/sprites/"
+  },
+  {
+   "optionDest": "datas",
+   "value": "C:/Users/tomi/Documents/battlegui2/battleship/UserInterface/sprites/oceangrid_final.png;UserInterface/sprites/"
+  },
+  {
+   "optionDest": "datas",
+   "value": "C:/Users/tomi/Documents/battlegui2/battleship/UserInterface/sprites/radargrid_final.png;UserInterface/sprites/"
+  },
+  {
+   "optionDest": "datas",
+   "value": "C:/Users/tomi/Documents/battlegui2/battleship/UserInterface/sprites/sink.png;UserInterface/sprites/"
+  },
+  {
+   "optionDest": "datas",
+   "value": "C:/Users/tomi/Documents/battlegui2/battleship/UserInterface/sprites/sink2.png;UserInterface/sprites/"
+  },
+  {
+   "optionDest": "datas",
+   "value": "C:/Users/tomi/Documents/battlegui2/battleship/UserInterface/sprites/sonar.ico;UserInterface/sprites/"
+  }
+ ],
+ "nonPyinstallerOptions": {
+  "increaseRecursionLimit": true,
+  "manualArguments": ""
+ }
+}
