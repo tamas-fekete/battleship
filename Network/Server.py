@@ -64,6 +64,29 @@ class Server():
             guiShips = pickle.dumps(guiShips)
             self.connection[0].send(guiShips)
 
+            ''' Szerver ötlet: 
+            
+            -for loop-ban vár 2 connection-ig a playerekre.
+            -P1-nek küldi a hajókat, P2-nek küldi a hajókat
+            
+            while játék:
+            - P1 től vár egy koordinátát.
+            - P1 nek elküldi a resultot
+            - P2 nek elküldi a resultot
+            
+            - P2-től vár egy koordinátát
+            - P2-nek elküldi a resultot
+            - P1-nek elküldi a resultot
+            
+            a result az a "radar" vagy az "ocean" grid
+            
+            '''
+
+
+
+
+
+
             # player_1_info = pickle.loads(self.connection[0].recv(1024))
             # print(player_1_info)
             #
@@ -85,9 +108,6 @@ class Server():
             # message = "client2 has sent me a message"
             # data_arr = pickle.dumps(message)
             # self.connection[0].send(data_arr)
-
-
-# wait for two clients to connect before we start the game
 
 
 if __name__ == '__main__':
