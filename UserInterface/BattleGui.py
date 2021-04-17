@@ -5,6 +5,7 @@ from gameLogic.PlayerState import PlayerState
 from AI.AI import AIClass
 import pickle
 import socket
+import threading
 
 class Cons:
     BOARD_WIDTH = 342
@@ -111,7 +112,7 @@ class BattleGui(tk.Frame):
         self.gameInfo.pack()
         self.textBox = tk.Text(master=self, width=40, height=1)
         self.textBox.pack()
-        self.bind_all("<Return>", self.onEnter)
+        self.bindID = self.bind_all("<Return>", self.onEnter)
 
     def loadImages(self):
 
@@ -289,6 +290,7 @@ class BattleGuiOnline(BattleGui):
         self.gameInfo = None
         self.textBox = None
         self.playerState = None
+        self.bindID = None
 
         self.winner = None
         self.myInput = None  # az elejen ebben a valtozoban lesz elmentve a letenni kivant hajo, aztan pedig a loves koordinataja
@@ -331,57 +333,52 @@ class BattleGuiOnline(BattleGui):
         # receive player state from server:
         self.playerState = self.receiveData()
 
+        if self.playerState == "Defender":
+            # disable entry field and disable enter key
+            self.entry.config(state=tk.DISABLED)
+            self.unbind("<Return>", self.bindID)
+
+        receiveThread = threading.Thread(target=self.receiveDataFromServerThread, args=(self.playerState,), daemon=True)
+        receiveThread.start()
         self.bind_all("<Return>", self.onEnter)
 
     def onEnter(self, event):
 
-        if self.playerState == "Attacker": # "Attacker" "Defender" playerState, lehet ezek nem a legjobb elnevezesek
-            self.myInput = self.getAttackCoordinates()
-            self.deleteEntryUpdateTextBox()
+        self.myInput = self.getAttackCoordinates()
+        self.deleteEntryUpdateTextBox()
 
-            print("sending attack coordinates")
-            self.sendData(self.myInput)
+        print("sending attack coordinates")
+        self.sendData(self.myInput)
 
-            print("waiting for opponent state")
-            opponentState = self.receiveData()
-            print("received opponent state")
 
-            self.updateRadar(opponentState)
+    def receiveDataFromServerThread(self, playerState):
+        ps = playerState
+        while True:
+            if ps == "Attacker":
+                # receive opponentState first:
+                opponentState = self.receiveData()
+                self.updateRadar(opponentState)
 
-            print("waiting for state")
-            grid = self.receiveData()
-            print("received state")
-            self.updateOcean(grid)
-            # self.playerState = "Defender"
+                # disable entry field and disable enter key
+                self.entry.config(state=tk.DISABLED)
+                self.unbind("<Return>", self.bindID)
 
-        elif self.playerState == "Defender":
-            print("waiting for state beginning")
-            grid = self.receiveData()
-            print("received state beginning")
-            self.updateOcean(grid)
+                ps = " "
+            else:
+                grid = self.receiveData()
+                self.updateOcean(grid)
 
-            self.myInput = self.getAttackCoordinates()
-            self.deleteEntryUpdateTextBox()
+                # Enable entry field and enable enter key
+                self.entry.config(state=tk.NORMAL)
+                self.bind_all("<Return>", self.onEnter)
 
-            print("sending attack coordinates")
-            self.sendData(self.myInput)
 
-            print("waiting for opponent state")
-            opponentState = self.receiveData()
-            print("received opponent state")
+                opponentState = self.receiveData()
+                self.updateRadar(opponentState)
 
-            self.updateRadar(opponentState)
-
-            print("waiting for state end")
-            grid = self.receiveData()
-            print("received state end")
-            self.updateOcean(grid)
-
-            # self.playerState = "Defender"
-            self.playerState = "Attacker"
-
-        else:
-            pass
+                # disable entry field and disable enter key
+                self.entry.config(state=tk.DISABLED)
+                self.unbind("<Return>", self.bindID)
 
     def getAttackCoordinates(self):
         return self.entry.get()
