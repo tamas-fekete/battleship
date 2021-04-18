@@ -1,3 +1,5 @@
+import os
+import sys
 import tkinter as tk
 from PIL import Image, ImageTk
 from helper import helper as hl
@@ -6,6 +8,18 @@ from AI.AI import AIClass
 import pickle
 import socket
 import threading
+
+
+def resourcePath(relative_path):
+    """ Get absolute path to resource, works for dev and for PyInstaller """
+    try:
+        # PyInstaller creates a temp folder and stores path in _MEIPASS
+        base_path = sys._MEIPASS
+    except Exception:
+        base_path = os.path.abspath(".")
+
+    return os.path.join(base_path, relative_path)
+
 
 class Cons:
     BOARD_WIDTH = 342
@@ -41,8 +55,8 @@ class BattleGui(tk.Frame):
 
     def __init__(self, parent, controller, randomShips, width, height):
         tk.Frame.__init__(self, master=parent, width=width, height=height)
-        self.boardShips = Board(parent=self, imageBackground=Image.open("UserInterface/sprites/oceangrid_final.png"))
-        self.radarShips = Board(parent=self, imageBackground=Image.open("UserInterface/sprites/radargrid_final.png"))
+        self.boardShips = Board(parent=self, imageBackground=Image.open(resourcePath("UserInterface/sprites/oceangrid_final.png")))
+        self.radarShips = Board(parent=self, imageBackground=Image.open(resourcePath("UserInterface/sprites/radargrid_final.png")))
 
         self.inputText = None
         self.entry = None
@@ -117,49 +131,49 @@ class BattleGui(tk.Frame):
     def loadImages(self):
 
         try:
-            self.ihit = Image.open("UserInterface/sprites/hit.png")
+            self.ihit = Image.open(resourcePath("UserInterface/sprites/hit.png"))
             self.hit = ImageTk.PhotoImage(self.ihit)
 
-            self.imiss = Image.open("UserInterface/sprites/miss.png")
+            self.imiss = Image.open(resourcePath("UserInterface/sprites/miss.png"))
             self.miss = ImageTk.PhotoImage(self.imiss)
 
-            self.imiss2 = Image.open("UserInterface/sprites/miss2.png")
+            self.imiss2 = Image.open(resourcePath("UserInterface/sprites/miss2.png"))
             self.miss2 = ImageTk.PhotoImage(self.imiss2)
 
-            self.isink = Image.open("UserInterface/sprites/sink.png")
+            self.isink = Image.open(resourcePath("UserInterface/sprites/sink.png"))
             self.sink = ImageTk.PhotoImage(self.isink)
 
-            self.isink2 = Image.open("UserInterface/sprites/sink2.png")
+            self.isink2 = Image.open(resourcePath("UserInterface/sprites/sink2.png"))
             self.sink2 = ImageTk.PhotoImage(self.isink2)
 
-            self.iship1vertical = Image.open("UserInterface/sprites/1vertical.png")
+            self.iship1vertical = Image.open(resourcePath("UserInterface/sprites/1vertical.png"))
             self.ship1vertical = ImageTk.PhotoImage(self.iship1vertical)
 
-            self.iship2vertical = Image.open("UserInterface/sprites/2vertical.png")
+            self.iship2vertical = Image.open(resourcePath("UserInterface/sprites/2vertical.png"))
             self.ship2vertical = ImageTk.PhotoImage(self.iship2vertical)
 
-            self.iship3vertical = Image.open("UserInterface/sprites/3vertical.png")
+            self.iship3vertical = Image.open(resourcePath("UserInterface/sprites/3vertical.png"))
             self.ship3vertical = ImageTk.PhotoImage(self.iship3vertical)
 
-            self.iship4vertical = Image.open("UserInterface/sprites/4vertical.png")
+            self.iship4vertical = Image.open(resourcePath("UserInterface/sprites/4vertical.png"))
             self.ship4vertical = ImageTk.PhotoImage(self.iship4vertical)
 
-            self.iship5vertical = Image.open("UserInterface/sprites/5vertical.png")
+            self.iship5vertical = Image.open(resourcePath("UserInterface/sprites/5vertical.png"))
             self.ship5vertical = ImageTk.PhotoImage(self.iship5vertical)
 
-            self.iship1horizontal = Image.open("UserInterface/sprites/1horizontal.png")
+            self.iship1horizontal = Image.open(resourcePath("UserInterface/sprites/1horizontal.png"))
             self.ship1horizontal = ImageTk.PhotoImage(self.iship1horizontal)
 
-            self.iship2horizontal = Image.open("UserInterface/sprites/2horizontal.png")
+            self.iship2horizontal = Image.open(resourcePath("UserInterface/sprites/2horizontal.png"))
             self.ship2horizontal = ImageTk.PhotoImage(self.iship2horizontal)
 
-            self.iship3horizontal = Image.open("UserInterface/sprites/3horizontal.png")
+            self.iship3horizontal = Image.open(resourcePath("UserInterface/sprites/3horizontal.png"))
             self.ship3horizontal = ImageTk.PhotoImage(self.iship3horizontal)
 
-            self.iship4horizontal = Image.open("UserInterface/sprites/4horizontal.png")
+            self.iship4horizontal = Image.open(resourcePath("UserInterface/sprites/4horizontal.png"))
             self.ship4horizontal = ImageTk.PhotoImage(self.iship4horizontal)
 
-            self.iship5horizontal = Image.open("UserInterface/sprites/5horizontal.png")
+            self.iship5horizontal = Image.open(resourcePath("UserInterface/sprites/5horizontal.png"))
             self.ship5horizontal = ImageTk.PhotoImage(self.iship5horizontal)
 
         except IOError as e:
@@ -280,8 +294,8 @@ class BattleGui(tk.Frame):
 class BattleGuiOnline(BattleGui):
     def __init__(self, parent, controller, width, height):
         tk.Frame.__init__(self, master=parent, width=width, height=height)
-        self.boardShips = Board(parent=self, imageBackground=Image.open("UserInterface/sprites/oceangrid_final.png"))
-        self.radarShips = Board(parent=self, imageBackground=Image.open("UserInterface/sprites/radargrid_final.png"))
+        self.boardShips = Board(parent=self, imageBackground=Image.open(resourcePath("UserInterface/sprites/oceangrid_final.png")))
+        self.radarShips = Board(parent=self, imageBackground=Image.open(resourcePath("UserInterface/sprites/radargrid_final.png")))
 
         self.clientsocket = None
 
@@ -325,7 +339,7 @@ class BattleGuiOnline(BattleGui):
 
         # connect to server:
         self.clientsocket = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
-        self.clientsocket.connect(('192.168.0.24', 5001))
+        self.clientsocket.connect(('188.142.201.199', 5001))
 
         guiShips = self.receiveData()
         self.drawShips(guiShips)
@@ -456,7 +470,7 @@ class MainGuiApp(tk.Tk):
         # self.iconbitmap("UserInterface/sprites/sonar.ico")
         self.geometry("1000x500")
         self.title("BattleShip")
-        ibackground = Image.open("UserInterface/sprites/background.jpg")
+        ibackground = Image.open(resourcePath("UserInterface/sprites/background.jpg"))
         background = ImageTk.PhotoImage(ibackground)
         bgLabel = tk.Label(self, image=background)
         bgLabel.place(x=0, y=0, relwidth=1, relheight=1)
