@@ -62,6 +62,7 @@ class BattleGui(tk.Frame):
         self.entry = None
         self.gameInfo = None
         self.textBox = None
+        self.bindID = None
 
         self.winner = None
         self.myInput = None     # az elejen ebben a valtozoban lesz elmentve a letenni kivant hajo, aztan pedig a loves koordinataja
@@ -125,6 +126,7 @@ class BattleGui(tk.Frame):
         self.gameInfo = tk.Label(master=self, text="Game Information:")
         self.gameInfo.pack()
         self.textBox = tk.Text(master=self, width=40, height=1)
+
         self.textBox.pack()
         self.bindID = self.bind_all("<Return>", self.onEnter)
 
@@ -197,8 +199,11 @@ class BattleGui(tk.Frame):
         if self.guiReady:
             self.myInput = self.entry.get()
             self.entry.delete(0, tk.END)
+
+            self.textBox.config(state=tk.NORMAL)
             self.textBox.delete("1.0", tk.END)
             self.textBox.insert(tk.END, self.myInput + "\n")
+            self.textBox.config(state=tk.DISABLED)
 
             if self.player1.gameState == 0:  # init state
                 ship = self.player1.readIn()
@@ -317,6 +322,10 @@ class BattleGuiOnline(BattleGui):
         self.boardShips.pack(side=tk.LEFT, expand="true")
         self.radarShips.pack(side=tk.RIGHT, expand="true")
 
+        tk.Label(master=self, text="IP Address", name="ipAddressLabel").pack()
+        self.ipAddressEntry = tk.Entry(master=self, name="ipAddressEntry")
+        self.ipAddressEntry.pack()
+
         button1 = tk.Button(self, text="Join Game", name="joingame", command=self.joinGame)
         button2 = tk.Button(self, text="Start Page", name="startpage", command=lambda: controller.showFrame("StartPage"))
 
@@ -325,6 +334,10 @@ class BattleGuiOnline(BattleGui):
 
     def joinGame(self):
 
+        ipAddress = self.ipAddressEntry.get()
+
+        self.nametowidget("ipAddressLabel").destroy()
+        self.nametowidget("ipAddressEntry").destroy()
         self.nametowidget("joingame").destroy()
         self.nametowidget("startpage").destroy()
 
@@ -339,7 +352,7 @@ class BattleGuiOnline(BattleGui):
 
         # connect to server:
         self.clientsocket = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
-        self.clientsocket.connect(('188.142.201.199', 5001))
+        self.clientsocket.connect((ipAddress, 5001))
 
         guiShips = self.receiveData()
         self.drawShips(guiShips)
