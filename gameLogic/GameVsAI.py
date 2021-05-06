@@ -17,36 +17,31 @@ class GameVsAI:
         print("AI has placed its ships.")
 
         self.playerCommunicator.setGameVsAI(self)
-        #self.gameLogic.readIn()
+        # self.gameLogic.readIn()
 
     def game(self):
         responseAI = None
 
-        while(not self.isEnd):
+        while (not self.isEnd):
             response = self.gameLogicAI.responseOfMissile(self.gameLogic.shoot())
             self.gameLogic.updateOpponentState(response)
-            if(len(self.gameLogicAI.playerOneShips) == 0):
+            if (len(self.gameLogicAI.playerOneShips) == 0):
                 self.isEnd = True
                 self.winner = "You"
 
             AInextshot = self.AI.nextStep(responseAI)
-            self.printStateForMe("AI shoot: ")  #TODO az indexet vissza kell alakítani koordinátává
+            self.printStateForMe("AI shoot: ")  # TODO az indexet vissza kell alakítani koordinátává
             responseAI = self.gameLogic.responseOfMissile(AInextshot)
-            #print(responseAI)
+            # print(responseAI)
             self.gameLogicAI.setPreviousShot(AInextshot)
             self.gameLogicAI.updateOpponentState(responseAI)
             if (len(self.gameLogic.playerOneShips) == 0):
                 self.isEnd = True
                 self.winner = "AI"
 
-
-            self.playerCommunicator.printState(self.gameLogic.printState())
+        # self.playerCommunicator.printState(self.gameLogic.printState())
 
         self.playerCommunicator.printState("The winner is " + self.winner)
 
-
-
     def printStateForMe(self, state):
         self.playerCommunicator.printState(state)
-
-

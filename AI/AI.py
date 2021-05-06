@@ -1,29 +1,32 @@
 from helper import helper as hl
 from gameLogic.PlayerState import PlayerState
 import random
+import logging
 
 
 class AIClass(PlayerState):
     def __init__(self):
         super().__init__(None, False)
-        self.lastShot=None
-        self.myShots=[]
-        self.possibleShots=list(range(0,100))
+        self.lastShot = None
+        self.myShots = []
+        self.possibleShots = list(range(0, 100))
         random.shuffle(self.possibleShots)
-        #print(self.possibleShots)
-        self.nextStepGenerator=self.calculateNextStep()
-        self.nextStepGeneratorRandom = self.calculateNextStepRandom()
-        self.replyFromServer=hl.States.MISSED
-        self.myShotsReplies=[]
-        self.possibleDeleteindicesHorizontal=[]
-        self.possibleDeleteindicesVertical=[]
-        self.sinkremove=[]
-        self.memo=None
-        self.myShips = None #= [[0], [15], [26, 27], [45, 55]]
-        #self.initShips()
+        # print(self.possibleShots)
+        logging.debug(self.possibleShots)
 
-    def nextStep(self,replyfromserver=hl.States.MISSED):
-        self.replyFromServer=replyfromserver
+        self.nextStepGenerator = self.calculateNextStep()
+        self.nextStepGeneratorRandom = self.calculateNextStepRandom()
+        self.replyFromServer = hl.States.MISSED
+        self.myShotsReplies = []
+        self.possibleDeleteindicesHorizontal = []
+        self.possibleDeleteindicesVertical = []
+        self.sinkremove = []
+        self.memo = None
+        self.myShips = None  # = [[0], [15], [26, 27], [45, 55]]
+        # self.initShips()
+
+    def nextStep(self, replyfromserver=hl.States.MISSED):
+        self.replyFromServer = replyfromserver
         return next(self.nextStepGenerator)
 
         # minden hajó egy list ebben a list-ben, a hajo altal felvett koordinatakat tartalmazza
@@ -31,67 +34,74 @@ class AIClass(PlayerState):
     def calculateNextStepRandom(self):
         for i in self.possibleShots:
             yield i
+
     def calculateNextStep(self):
         nextstep = self.possibleShots[0]
         self.possibleShots.remove(self.possibleShots[0])
         self.myShots.append(nextstep)
-        print("LOVES",nextstep)
+        # print("LOVES", nextstep)
+        logging.info("LOVES " + str(nextstep))
         yield nextstep
         while True:
-            skip=False
+            skip = False
             self.myShotsReplies.append(self.replyFromServer)
-            prev_hits=[]
-            for i in range(1,len(self.myShots)+1):#fontos emléket keresve
-                #print(self.myShots[-i], self.myShotsReplies[-i])
-                if self.myShotsReplies[-i]==hl.States.HIT:
+            prev_hits = []
+            for i in range(1, len(self.myShots) + 1):  # fontos emléket keresve
+                # print(self.myShots[-i], self.myShotsReplies[-i])
+                if self.myShotsReplies[-i] == hl.States.HIT:
                     prev_hits.append(self.myShots[-i])
-                if self.myShotsReplies[-i]==hl.States.SINK:
+                if self.myShotsReplies[-i] == hl.States.SINK:
                     break
-            if len(prev_hits)>=2:
-                print("HOPHOP")
-                bigger=max(prev_hits)
-                smaller=min(prev_hits)
-                difference_between_two_hits=bigger-smaller
-                print(bigger, smaller)
-                print(difference_between_two_hits)
-                if difference_between_two_hits<10:
-                    self.memo ={bigger:bigger+1,
-                                smaller:smaller-1
-                   }
+            if len(prev_hits) >= 2:
+                # print("HOPHOP")
+                logging.debug("HOPHOP")
+                bigger = max(prev_hits)
+                smaller = min(prev_hits)
+                difference_between_two_hits = bigger - smaller
+                # print(bigger, smaller)
+                # print(difference_between_two_hits)
+                logging.debug(str(bigger) + " " + str(smaller))
+                logging.debug(str(difference_between_two_hits))
+                if difference_between_two_hits < 10:
+                    self.memo = {bigger: bigger + 1,
+                                 smaller: smaller - 1
+                                 }
                 else:
                     self.memo = {bigger: bigger + 10,
                                  smaller: smaller - 10
                                  }
-                print("MEMO MOST",self.memo)
-                for key,i in self.memo.items():
-                    print("keresem, hogy ez jó",i)
-                    print("i in poss",i in self.possibleShots)
-                    print("i in possibleship", i in hl.getPossibleShipPositions(key))
+                print("MEMO MOST", self.memo)
+                for key, i in self.memo.items():
+                    logging.debug("keresem, hogy ez jó " + str(i))
+                    logging.debug("i in poss " + str(i) in self.possibleShots)
+                    logging.debug("i in possibleship " + str(i) in hl.getPossibleShipPositions(key))
+
                     if i in self.possibleShots and i in hl.getPossibleShipPositions(key):
                         self.possibleShots.remove(i)
-                        print("FURA LOVEs",i)
+                        logging.debug("FURA LOVEs", i)
                         self.myShots.append(i)
-                        nextstep=i
-                        skip=True
+                        nextstep = i
+                        skip = True
                         break
             if skip:
-                print("okosan ez lett",nextstep)
+                logging.debug("okosan ez lett", nextstep)
                 yield nextstep
 
             else:
-                if self.replyFromServer==hl.States.MISSED:
-                    print(self.myShots[-1], "NEM TALÁLT")
-                    nextstep=self.possibleShots[0]
+                if self.replyFromServer == hl.States.MISSED:
+                    logging.debug(str(self.myShots[-1]) + " NEM TALÁLT")
+                    nextstep = self.possibleShots[0]
                     self.possibleShots.remove(self.possibleShots[0])
-                    print("LOVES",nextstep)
+                    # print("LOVES", nextstep)
+                    logging.debug("LOVES " + str(nextstep))
                     self.myShots.append(nextstep)
                     yield nextstep
-                elif self.replyFromServer==hl.States.HIT:
-                    print(self.myShots[-1], "TALÁLT")
-                    preferred_indeces= hl.getPossibleShipPositions(self.myShots[-1])
+                elif self.replyFromServer == hl.States.HIT:
+                    logging.debug(str(self.myShots[-1]) +  " TALÁLT")
+                    preferred_indeces = hl.getPossibleShipPositions(self.myShots[-1])
                     random.shuffle(preferred_indeces)
-                    print(self.possibleShots)
-                    delete=[]
+                    logging.debug(str(self.possibleShots))
+                    delete = []
                     for i in preferred_indeces:
                         if i not in self.possibleShots:
                             delete.append(i)
@@ -100,25 +110,25 @@ class AIClass(PlayerState):
 
                     for i in delete:
                         preferred_indeces.remove(i)
-                    print(preferred_indeces)
-                    self.possibleShots=preferred_indeces+self.possibleShots
+                    logging.debug(str(preferred_indeces))
+                    self.possibleShots = preferred_indeces + self.possibleShots
                     # for i in range(len(preferred_indeces)):
                     #     if preferred_indeces[i] in self.possibleShots:
                     #         tmp = self.possibleShots[i]
                     #         self.possibleShots.remove(preferred_indeces[i])
                     #         self.possibleShots[i] = preferred_indeces[i]
                     #         self.possibleShots.append(tmp)
-                    print(self.possibleShots)
+                    logging.debug(str(self.possibleShots))
                     nextstep = self.possibleShots[0]
-                    self.possibleShots.remove(self.possibleShots[0])#amit lövök azt kiveszem
-                    print("LOVES",nextstep)
+                    self.possibleShots.remove(self.possibleShots[0])  # amit lövök azt kiveszem
+                    # print("LOVES", nextstep)
+                    logging.info("LOVES " + str(nextstep))
                     self.myShots.append(nextstep)
                     yield nextstep
 
-                elif self.replyFromServer==hl.States.SINK:
+                elif self.replyFromServer == hl.States.SINK:
 
-                    print(self.myShots[-1], "SINK")
-                    need_to_be_deleted=[]
+                    need_to_be_deleted = []
                     need_to_be_deleted.append(self.myShots[-1])
                     for i in range(2, len(self.myShots) + 1):  # fontos emléket keresve
                         print(self.myShots[-i], self.myShotsReplies[-i])
@@ -126,27 +136,18 @@ class AIClass(PlayerState):
                             need_to_be_deleted.append(self.myShots[-i])
                         if self.myShotsReplies[-i] == hl.States.SINK:
                             break
-                    print("HOPHOPppppsink")
+                    logging.debug("HOPHOPppppsink")
                     for i in need_to_be_deleted:
                         for d in hl.getNeighbours(i):
                             if d in self.possibleShots:
-                                print("törlöm",d)
+                                logging.debug("törlöm " + str(d))
                                 self.possibleShots.remove(d)
 
-                    nextstep=self.possibleShots[0]
+                    nextstep = self.possibleShots[0]
                     self.possibleShots.remove(nextstep)
-                    print("SINK LOVES", nextstep)
+                    logging.debug("SINK LOVES " + str(nextstep))
                     self.myShots.append(nextstep)
                     yield nextstep
 
-
     def placeShips(self):
         return self.myShips
-
-
-
-
-
-
-
-

@@ -1,5 +1,7 @@
 from helper import helper as hl
 import random
+
+
 # PlayerState osztaly: sorfolytonos repr. allapot, jatekosok hajoinak tarolasa, szukseges hajok
 
 
@@ -8,7 +10,7 @@ class PlayerState():
         self.previousShot = None
         self.state = [hl.States.WATER] * 100
         self.opponentState = [hl.States.WATER] * 100
-        self.ships = [[2, 1], [2, 2], [3, 3], [2, 4], [1, 5]] #self.ships = [[2, 1], [1, 5]] #
+        self.ships = [[2, 1], [2, 2], [3, 3], [2, 4], [1, 5]]  # self.ships = [[2, 1], [1, 5]] #
         self.playerOneShips = []
         self.forbiddenSpaces = set([])
         if randomShips:
@@ -51,7 +53,7 @@ class PlayerState():
             if ((i + 1) % 10 == 0) and (i != 99):
                 stateStr += "\n" + letters[counter] + " "
                 counter += 1
-        print(stateStr)
+        # print(stateStr)
 
     def printStateForMe(self):
         letters = ['B', 'C', 'D', 'E', 'F', 'G', 'H', 'I', 'J']
@@ -78,7 +80,6 @@ class PlayerState():
                     self.state[coord] = hl.States.SINK
 
                     for i in range(0, 100):
-                        # TODO ez lehet, hogy nem kosher igy
                         if self.state[i] == hl.States.HIT and [elem != hl.States.SHIP for elem in hl.getNeighbours(i)]:
                             self.state[i] = hl.States.SINK
                     return hl.States.SINK
@@ -113,7 +114,7 @@ class PlayerState():
         self.opponentState[self.previousShot] = response
         if response == hl.States.SINK:
             for i in range(0, 100):
-                # TODO ez lehet, hogy nem kosher igy
+                # TODO ez lehet, hogy nem jo igy
                 if self.opponentState[i] == hl.States.HIT and [elem != hl.States.SHIP for elem in hl.getNeighbours(i)]:
                     self.opponentState[i] = hl.States.SINK
 
@@ -179,15 +180,15 @@ class PlayerState():
             return guiShip
             # raise ValueError("Wrong coordinates, you can't place ships this close to each other!")
 
-        print(self.printState())
+        # print(self.printState())
         # print(forbiddenSpaces)
 
         # print(self.playerOneShips)
-        self.j +=1
-        guiShip.successful = True   # ship was successfully placed, we need to send it back to the gui
+        self.j += 1
+        guiShip.successful = True  # ship was successfully placed, we need to send it back to the gui
         if i == 5:  # this is the last ship, readIn function no longer needs to be called
             self.gameState = 1  # change game state
-            print(self.printState())
+            # self.printState())
         return guiShip
 
     def getGameState(self):
@@ -200,72 +201,72 @@ class PlayerState():
 
     def initShips(self):
 
-        myShips=[]
-        possiblePositions= [i for i in range(100)]
-        sizes = [5, 4, 4, 3, 3, 3, 2, 2, 1, 1] # sizes = [5, 2, 1, 1]  # sizes=[5,4,4,3,3,3,2,2,1,1]
+        myShips = []
+        possiblePositions = [i for i in range(100)]
+        sizes = [5, 4, 4, 3, 3, 3, 2, 2, 1, 1]  # sizes = [5, 2, 1, 1]  # sizes=[5,4,4,3,3,3,2,2,1,1]
         for i in range(len(sizes)):
-            pos_good=False
-            pos=None
-            good_dirs=[]
+            pos_good = False
+            pos = None
+            good_dirs = []
             while not pos_good:
                 pos = random.randint(0, 99)
-                #print(pos)
+                # print(pos)
                 for size in range(sizes[i]):
-                    print(int(pos/10),int((pos+size)/10))
-                    if pos+size not in possiblePositions :
+                    # print(int(pos/10),int((pos+size)/10))
+                    if pos + size not in possiblePositions:
                         break
-                    elif int(pos/10) != int((pos+size)/10):
+                    elif int(pos / 10) != int((pos + size) / 10):
                         break
                     else:
-                        if size==sizes[i]-1:
+                        if size == sizes[i] - 1:
                             good_dirs.append(1)
-                            pos_good=True
+                            pos_good = True
                 for size in range(sizes[i]):
-                    if pos-size not in possiblePositions :
+                    if pos - size not in possiblePositions:
                         break
-                    elif int(pos/10) != int((pos-size)/10):
+                    elif int(pos / 10) != int((pos - size) / 10):
                         break
                     else:
-                        if size==sizes[i]-1:
+                        if size == sizes[i] - 1:
                             good_dirs.append(-1)
-                            pos_good=True
+                            pos_good = True
                 for size in range(sizes[i]):
-                    if pos+(size*10) not in possiblePositions :
+                    if pos + (size * 10) not in possiblePositions:
                         break
                     else:
-                        if size==sizes[i]-1:
+                        if size == sizes[i] - 1:
                             good_dirs.append(10)
-                            pos_good=True
+                            pos_good = True
                 for size in range(sizes[i]):
-                    if pos-(size*10) not in possiblePositions :
+                    if pos - (size * 10) not in possiblePositions:
                         break
                     else:
-                        if size==sizes[i]-1:
+                        if size == sizes[i] - 1:
                             good_dirs.append(-10)
-                            pos_good=True
+                            pos_good = True
 
-            if sizes[i]==1:
-                need_to_be_deleted= hl.getNeighbours(pos)
-                #print(need_to_be_deleted,pos)
+            if sizes[i] == 1:
+                need_to_be_deleted = hl.getNeighbours(pos)
+                # print(need_to_be_deleted,pos)
                 for j in need_to_be_deleted:
                     if j in possiblePositions:
                         possiblePositions.remove(j)
-                #print(possiblePositions)
-                nextship=[pos]
+                # print(possiblePositions)
+                nextship = [pos]
                 myShips.append(nextship)
             else:
-                nextship=[pos]
+                nextship = [pos]
                 random.shuffle(good_dirs)
-                for h in range(1,sizes[i]):
-                    nextship.append(pos+good_dirs[0]*h)
+                for h in range(1, sizes[i]):
+                    nextship.append(pos + good_dirs[0] * h)
                 for coord in nextship:
-                    need_to_be_deleted=hl.getNeighbours(coord)
+                    need_to_be_deleted = hl.getNeighbours(coord)
                     for d in need_to_be_deleted:
                         if d in possiblePositions:
                             possiblePositions.remove(d)
                 myShips.append(nextship)
 
-        print(myShips)
+        # print(myShips)
 
         # save myShips to state
         self.state = [hl.States.WATER] * 100
@@ -280,7 +281,7 @@ class PlayerState():
         for ship in myShips:
             guiship = hl.guiShip()
             coordOne = ship[0]
-            coordTwo = ship[len(ship)-1]
+            coordTwo = ship[len(ship) - 1]
 
             guiship.size = len(ship)
 
