@@ -70,7 +70,7 @@ class AIClass(PlayerState):
                     self.memo = {bigger: bigger + 10,
                                  smaller: smaller - 10
                                  }
-                print("MEMO MOST", self.memo)
+                logging.debug("MEMO MOST " + str(self.memo))
                 for key, i in self.memo.items():
                     logging.debug("keresem, hogy ez jó " + str(i))
                     logging.debug("i in poss " + str(i) in self.possibleShots)
@@ -78,13 +78,13 @@ class AIClass(PlayerState):
 
                     if i in self.possibleShots and i in hl.getPossibleShipPositions(key):
                         self.possibleShots.remove(i)
-                        logging.debug("FURA LOVEs", i)
+                        logging.debug("FURA LOVES " + str(i))
                         self.myShots.append(i)
                         nextstep = i
                         skip = True
                         break
             if skip:
-                logging.debug("okosan ez lett", nextstep)
+                logging.debug("okosan ez lett " + str(nextstep))
                 yield nextstep
 
             else:
@@ -131,7 +131,7 @@ class AIClass(PlayerState):
                     need_to_be_deleted = []
                     need_to_be_deleted.append(self.myShots[-1])
                     for i in range(2, len(self.myShots) + 1):  # fontos emléket keresve
-                        print(self.myShots[-i], self.myShotsReplies[-i])
+                        logging.debug(str(self.myShots[-i]) + " " +str(self.myShotsReplies[-i]))
                         if self.myShotsReplies[-i] == hl.States.HIT:
                             need_to_be_deleted.append(self.myShots[-i])
                         if self.myShotsReplies[-i] == hl.States.SINK:

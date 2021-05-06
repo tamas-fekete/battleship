@@ -52,7 +52,9 @@ class Board(tk.Canvas):
 
 
 class BattleGui(tk.Frame):
-
+    """
+    egz ketto harom negy ot hat
+    """
     def __init__(self, parent, controller, randomShips, width, height):
         tk.Frame.__init__(self, master=parent, width=width, height=height)
         self.boardShips = Board(parent=self, imageBackground=Image.open(resourcePath("UserInterface/sprites/oceangrid_final.png")))
@@ -222,7 +224,7 @@ class BattleGui(tk.Frame):
                 self.player1.updateOpponentState(response)
                 self.updateRadar(self.player1.opponentState)
                 # csalas:
-                print(self.AI.printState())
+                # print(self.AI.printState())
 
                 # ha az AI-nak elfogytak a hajoi, akkor nyert a jatekos
                 if len(self.AI.playerOneShips) == 0:
